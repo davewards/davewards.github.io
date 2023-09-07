@@ -19,7 +19,7 @@
 " style="max-width: 230px; max-height: 200px;">
       <h2>Court Scheduler</h2>
       <div class="row align-items-start" style="min-height: 150px;">
-        <div style="border: 1px solid lightgrey; min-height: 150px;" class="col-sm-12 col-md-3" id="court1">
+        <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court1">
           <h3>Court 1</h3>
           <div class="row">
             <div class="col" id="player1"></div>
@@ -31,7 +31,7 @@
             <div class="col" id="player4"></div>
           </div>
         </div>
-        <div style="border: 1px solid lightgrey; min-height: 150px;" class="col-sm-12 col-md-3" id="court2">
+        <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court2">
           <h3>Court 2</h3>
           <div class="row">
             <div class="col" id="player5"></div>
@@ -43,7 +43,7 @@
             <div class="col" id="player8"></div>
           </div>
         </div>
-        <div style="border: 1px solid lightgrey; min-height: 150px;" class="col-sm-12 col-md-3" id="court3">
+        <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court3">
           <h3>Court 3</h3>
           <div class="row">
             <div class="col" id="player9"></div>
@@ -55,7 +55,7 @@
             <div class="col" id="player12"></div>
           </div>
         </div>
-        <div style="border: 1px solid lightgrey; min-height: 150px;" class="col-sm-12 col-md-3" id="court4">
+        <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court4">
           <h3>Court 4</h3>
           <div class="row">
             <div class="col" id="player13"></div>
@@ -78,13 +78,13 @@
           <h4 id="formWarning" style="text-align: left; padding-top: 5px"></h4>
         </div>
         <div class="row align-items-start">
-          <div class="col pl-4 float-left" >
+          <div class="col-sm-12 col-md-4 pl-4 float-left" >
             <input type="string" class="form-control" id="newPlayer" name="newPlayer" placeholder="Type name">
           </div>
-          <div class="col pl-4 float-left" >
+          <div class="col-sm-12 col-md-4 pl-4 float-left" >
             <input type="number" class="form-control" id="newPlayerDivision" name="newPlayerDivision" placeholder="Type division">          
           </div>
-          <div class="col pl-4 float-left" >
+          <div class="col-sm-12 col-md-4 pl-4 float-left" >
             <button id="submitPlayer" class="form-control">Add Player</button>
           </div>
         </div>
@@ -103,7 +103,7 @@
         players = JSON.parse(window.localStorage.getItem('players'))
       }
       
-      
+      setTable(players)
 
       function resetPlayers(){
         players = players.map(player => {
@@ -124,20 +124,18 @@
         const maxPlayers = Math.floor(players.length / 4) * 4
         let playersForGames = players.filter(player => player[3] ==='Waiting').map(player => player[0]);
         if (playersForGames.length < maxPlayers){
-          console.log(maxPlayers - playersForGames.length)
           playersForGames = playersForGames.concat(getNext(players.filter(player => !playersForGames.includes(player[0]))).slice(0, maxPlayers - playersForGames.length).map(player => player[0]))
         }
         [...Array(16)].map((_, i) => document.getElementById("player" + (i+1)).innerHTML = '')
         playersForGames = shuffle(playersForGames).slice(0,maxPlayers);
         playersForGames.map((player, index) => {
-          document.getElementById("player" + (index+1)).innerHTML = player
+          document.getElementById("player" + (index+1)).innerHTML = `<h4>${player}</h4>`
         })
         players = players.map(player => {
           player[3] = playersForGames.includes(player[0])? 'Playing' : 'Waiting'
           player[2] = playersForGames.includes(player[0])? player[2] + 1 : player[2]
           return player
         })
-        console.log(players)
         setTable()
       }
 
