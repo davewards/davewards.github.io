@@ -134,21 +134,72 @@
                     <div id="player16"></div>
                 </div>
             </div>
+            <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court5">
+                <h3>Court 5</h3>
+                <hr>
+                <div class="row">
+                    <div id="player17"></div>
+                    <div id="player18"></div>
+                </div>
+                <div class="row">
+                    <div id="player19"></div>
+                    <div id="player20"></div>
+                </div>
+            </div>
+            <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court6">
+                <h3>Court 6</h3>
+                <hr>
+                <div class="row">
+                    <div id="player21"></div>
+                    <div id="player22"></div>
+                </div>
+                <div class="row">
+                    <div id="player23"></div>
+                    <div id="player24"></div>
+                </div>
+            </div>
+            <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court7">
+                <h3>Court 7</h3>
+                <hr>
+                <div class="row">
+                    <div id="player25"></div>
+                    <div id="player26"></div>
+                </div>
+                <div class="row">
+                    <div id="player27"></div>
+                    <div id="player28"></div>
+                </div>
+            </div>
+            <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court8">
+                <h3>Court 8</h3>
+                <hr>
+                <div class="row">
+                    <div id="player29"></div>
+                    <div id="player30"></div>
+                </div>
+                <div class="row">
+                    <div id="player31"></div>
+                    <div id="player32"></div>
+                </div>
+            </div>
         </div>
         <div class="row">
             <button id="newGame" onclick="setGames()" style="background-color: #7ba1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4">Next Game</button>
-            <button id="newGame" onclick="window.localStorage.setItem('players',[])" style="background-color: #7bc1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Clear Players</button>
+            <button id="newGame" onclick="clearPlayers()" style="background-color: #7bc1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Clear Players</button>
             <button id="newGame" onclick="resetPlayers()" style="background-color: #61ad71;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Reset Players</button>
         </div>
         <div class="row align-items-start">
             <div class="col-sm-12 col-md-4 pl-4 float-left">
-                <input type="number" class="form-control" id="courtsAvailable" name="" placeholder="How many courts have you got?">
+                <label>How many courts do you have? (max 8)</label>
+                <input type="number" class="form-control" id="courtsAvailable" name="" min="1" max="8" value="4" placeholder="How many courts have you got?">
             </div>
             <div class="col-sm-12 col-md-4 pl-4 float-left text-left">
+                <label>Upload player file (data is local only)</label>
                 <input type="file" class="form-control" id="csv" name="googleSheetURL" placeholder="Load local CSV file">
                 <label style="text-align: left;">File format expected: <b>CSV</b>. <br>Two columns: Name, Division. Eg. <br>Player One,4<br>Player Two,6</label>
             </div>
             <div class="col-sm-12 col-md-4 pl-4 float-left">
+                <label>Player Mode</label><br />
                 <label>Random</label>
                 <!-- <input type="checkbox" class="form-check-input" id="graded" name="graded" placeholder=""> -->
                 <label class="switch">
@@ -177,6 +228,13 @@
         </form>
         <div class="row align-items-start" style="margin-top: 30px">
             <table class="table" id="playerTable">
+                <thead>
+                  <th >Name</th>
+                  <th >Games Played</th>
+                  <th >Division</th>
+                  <th >Status</th>
+                  <th >Attending</th>
+                </thead>
                 <tbody id="tableRows">
                 </tbody>
             </table>
@@ -201,6 +259,12 @@
         setGames()
     }
 
+    function clearPlayers() {
+      players = []
+      setTable()
+      setGames()
+    }
+
     function comparePlayCounts(a, b) {
         return a[2] - b[2];
     }
@@ -210,19 +274,26 @@
     }
 
     function setGames() {
+        let s = [...Array(32)].map((_, i) => document.getElementById("player" + (i + 1)).innerHTML = '')
         let availablePlayers = players.filter(player => player[4])
-        const courtsAvailable = document.getElementById("courtsAvailable").value || 4;
-
+        let courtsAvailable = document.getElementById("courtsAvailable").value || 4;
+        if (parseInt(courtsAvailable) > 8) {
+          courtsAvailable = 8
+          document.getElementById("courtsAvailable").value = 8
+        }
+        // console.log(courtsAvailable)
+        let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
         if (document.getElementById('graded').checked) {
             setGamesGraded(availablePlayers, courtsAvailable)
         } else {
             setGamesStandard(availablePlayers, courtsAvailable)
         }
+        let u = [...Array(parseInt(courtsAvailable))].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "block")
     }
 
     function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1) {
 
-
+        const availablePlayersNames = availablePlayers.map(player => player[0])
         let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
         if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
         let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
@@ -236,7 +307,7 @@
             document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
         })
         players = players.map(player => {
-            if (availablePlayers.includes(player[0])) {
+            if (availablePlayersNames.includes(player[0])) {
                 player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
                 player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
             }
@@ -254,19 +325,36 @@
         let lastDivision = parseInt(availablePlayers[0][1])
         const playerCount = availablePlayers.length
 
+        let maxPlayersPerGroup = playerCount / courtsAvailable > 4? (playerCount / courtsAvailable) + playerCount % courtsAvailable : 4
         availablePlayers.map(player => {
             let division = player[1]
-            if (grades[lastDivision].length < (playerCount / courtsAvailable) + playerCount % courtsAvailable) {
+            if (grades[lastDivision].length < maxPlayersPerGroup) {
                 grades[lastDivision].push(player)
-            } else if (grades[player[1]].length >= (playerCount / courtsAvailable) + playerCount % courtsAvailable) {
+            } else if (grades[player[1]].length >= maxPlayersPerGroup) {
                 grades[parseInt(player[1]) + 1].push(player)
             } else {
                 grades[parseInt(player[1])].push(player)
             }
         })
         let currentCourt = 1
+        lastDivision = parseInt(availablePlayers[0][1])
+        Object.values(grades).map((division, index) => {
+          console.log(index, grades[index+1], maxPlayersPerGroup, 4 + (playerCount % courtsAvailable))
+          if (index > 1) {
+            if (grades[index + 1].length > 0 && grades[index + 1].length < maxPlayersPerGroup && grades[lastDivision].length <= 4 + (playerCount % courtsAvailable)) {
+              console.log('hi')
+              while (grades[lastDivision].length < 4 + (playerCount % courtsAvailable) && grades[index + 1].length > 0) {
+                grades[lastDivision].push(grades[index+1].shift())
+              }
+              if (grades[index+1].length > 0 ) lastDivision = index+1
+            } else {
+              lastDivision = index + 1
+            }
+          } 
+        })
         for (let division of Object.values(grades)) {
             if (division.length == 0) continue
+              console.log(division)
             setGamesStandard(division, 1, currentCourt)
             currentCourt += 4
         }
@@ -305,9 +393,9 @@
         let playerRows = ''
         players.map((player, index) => {
             if (player[4]) {
-                playerRows += `<tr><td>${player[0]}</td><td>${player[1]}</td><td>${player[3]}</td><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Attending</span></td><td></tr>`
+                playerRows += `<tr><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Attending</span></td><td></tr>`
             } else {
-                playerRows += `<tr><td>${player[0]}</td><td>${player[1]}</td><td>${player[3]}</td><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Not Attending</span></td><td></tr>`
+                playerRows += `<tr><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Not Attending</span></td><td></tr>`
             }
         })
 
