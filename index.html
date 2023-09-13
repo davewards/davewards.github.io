@@ -270,7 +270,7 @@
     }
 
     function compareDivisions(a, b) {
-        return a[1] - b[1];
+        return a[1] - b[1] || a[2] - b[2] || Math.random() - Math.random() ;
     }
 
     function setGames() {
@@ -325,7 +325,11 @@
         let lastDivision = parseInt(availablePlayers[0][1])
         const playerCount = availablePlayers.length
 
-        let maxPlayersPerGroup = playerCount / courtsAvailable > 4? (playerCount / courtsAvailable) + playerCount % courtsAvailable : 4
+        let maxPlayersPerGroup = playerCount / courtsAvailable > 4? (playerCount / courtsAvailable) + Math.floor(playerCount % courtsAvailable) : 4
+        
+        if (playerCount / maxPlayersPerGroup < 4){
+          maxPlayersPerGroup = Math.floor(playerCount / 4)
+        }
         availablePlayers.map(player => {
             let division = player[1]
             if (grades[lastDivision].length < maxPlayersPerGroup) {
@@ -338,11 +342,12 @@
         })
         let currentCourt = 1
         lastDivision = parseInt(availablePlayers[0][1])
+        
         Object.values(grades).map((division, index) => {
-          console.log(index, grades[index+1], maxPlayersPerGroup, 4 + (playerCount % courtsAvailable))
+          
           if (index > 1) {
-            if (grades[index + 1].length > 0 && grades[index + 1].length < maxPlayersPerGroup && grades[lastDivision].length <= 4 + (playerCount % courtsAvailable)) {
-              console.log('hi')
+            if (grades[index + 1].length > 0 && grades[lastDivision].length < maxPlayersPerGroup && grades[lastDivision].length <= 4 + Math.floor(playerCount % courtsAvailable)) {
+              
               while (grades[lastDivision].length < 4 + (playerCount % courtsAvailable) && grades[index + 1].length > 0) {
                 grades[lastDivision].push(grades[index+1].shift())
               }
@@ -354,8 +359,8 @@
         })
         for (let division of Object.values(grades)) {
             if (division.length == 0) continue
-              console.log(division)
-            setGamesStandard(division, 1, currentCourt)
+            
+            setGamesStandard(division, courtsAvailable, currentCourt)
             currentCourt += 4
         }
         // setTable()
@@ -436,6 +441,7 @@
     }
 
     const fileInput = document.getElementById('csv')
+    let attending = ['Anna Slevin','John Levesley','Arunachalam Sivaprakasam','Nitin Paliwal','Apoorv Purohit','Shozaib Rangoonwala','Priyam Bhadauria','Ketki Keskar','Haseeb Ahmed','Tim OFlynn',"Marie O'Flynn",'Emma Lyons','John Hampson','Adrian Barbour','Shweta Bhagat','Adil Qureshi','Fiona Hawkshaw','Kamrul Hasan']
     const readFile = () => {
         const reader = new FileReader()
         reader.onload = () => {
@@ -443,7 +449,7 @@
             Promise.all(reader.result.split('ï»¿').join('').split('\r').join('').split('\n').map(row => {
                 let player = row.split(',')
                 if (player.length > 1) {
-                    players.push([player[0], player[1], 0, 'Waiting', false])
+                    players.push([player[0], player[1], 0, 'Waiting', attending.includes(player[0])])
                 }
             })).then(setTable())
 
