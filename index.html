@@ -227,13 +227,28 @@
             </div>
         </form>
         <div class="row align-items-start" style="margin-top: 30px">
+            <h3>Present</h3>
             <table class="table" id="playerTable">
                 <thead>
-                  <th >Name</th>
-                  <th >Games Played</th>
-                  <th >Division</th>
-                  <th >Status</th>
-                  <th >Attending</th>
+                    <th>Attending</th>
+                    <th>Name</th>
+                    <th>Games Played</th>
+                    <th>Division</th>
+                    <th>Status</th>
+                </thead>
+                <tbody id="tableRowsAttending">
+                </tbody>
+            </table>
+        </div>
+        <div class="row align-items-start" style="margin-top: 30px">
+            <h3>Not Present</h3>
+            <table class="table" id="playerTable">
+                <thead>
+                    <th>Attending</th>
+                    <th>Name</th>
+                    <th>Games Played</th>
+                    <th>Division</th>
+                    <th>Status</th>
                 </thead>
                 <tbody id="tableRows">
                 </tbody>
@@ -260,17 +275,21 @@
     }
 
     function clearPlayers() {
-      players = []
-      setTable()
-      setGames()
+        players = []
+        setTable()
+        setGames()
     }
 
     function comparePlayCounts(a, b) {
-        return a[2] - b[2];
+        return a[2] - b[2]  || Math.random() - Math.random();
+    }
+
+    function comparePlayerNames(a, b) {
+        return a[0] - b[0];
     }
 
     function compareDivisions(a, b) {
-        return a[1] - b[1] || a[2] - b[2] || Math.random() - Math.random() ;
+        return parseInt(a[1]) - parseInt(b[1]) || a[2] - b[2] || Math.random() - Math.random() ;
     }
 
     function setGames() {
@@ -278,8 +297,8 @@
         let availablePlayers = players.filter(player => player[4])
         let courtsAvailable = document.getElementById("courtsAvailable").value || 4;
         if (parseInt(courtsAvailable) > 8) {
-          courtsAvailable = 8
-          document.getElementById("courtsAvailable").value = 8
+            courtsAvailable = 8
+            document.getElementById("courtsAvailable").value = 8
         }
         // console.log(courtsAvailable)
         let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
@@ -291,21 +310,30 @@
         let u = [...Array(parseInt(courtsAvailable))].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "block")
     }
 
-    function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1) {
-
+    function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, performShuffle = true, maxCount = null) {
+        
         const availablePlayersNames = availablePlayers.map(player => player[0])
+
         let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
         if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
+        if (maxCount) maxPlayers = maxCount
+        availablePlayers = availablePlayers.sort(comparePlayCounts)
         let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
         if (playersForGames.length < maxPlayers) {
             playersForGames = playersForGames.concat(getNext(availablePlayers.filter(player => !playersForGames.includes(player[0]))).slice(0, maxPlayers - playersForGames.length).map(player => player[0]))
         }
 
         // [...Array(16)].map((_, i) => document.getElementById("player" + (i + 1)).innerHTML = '')
-        playersForGames = shuffle(playersForGames).slice(0, maxPlayers);
+        if (performShuffle) {
+            playersForGames = shuffle(playersForGames)
+        }
+
+        playersForGames = playersForGames.slice(0, maxPlayers);
+        console.log(maxPlayers)
         playersForGames.map((player, index) => {
             document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
         })
+
         players = players.map(player => {
             if (availablePlayersNames.includes(player[0])) {
                 player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
@@ -316,7 +344,60 @@
         setTable()
     }
 
+    function chunkArray(arr, n) {
+      const size = Math.round(arr.length / n);
+      console.log(size, arr.length)
+      return Array.from({ length: n }, (v, i) =>
+        arr.slice(i * size, i * size + size)
+      );
+    }
+
     function setGamesGraded(availablePlayers, courtsAvailable) {
+
+        let courts = []
+        let secondaryCourts = []
+
+        let courtDivision = Math.floor(courtsAvailable%2) == 0 && courtsAvailable > 2 ? Math.floor(courtsAvailable/2) : parseInt(courtsAvailable)
+        
+        while (courts.length < courtDivision) {
+            courts.push([])
+            secondaryCourts.push([])
+        }
+        availablePlayers = availablePlayers.sort(compareDivisions)
+
+        let seenNames = []
+
+        const firstPromise = new Promise((resolve, reject) => {
+            let courtIndex = 0
+            courts = chunkArray(availablePlayers.filter(player => player[3] === 'Waiting'), courtDivision)
+            console.log(courts.length)
+            resolve("")
+        })
+        firstPromise.then((ret) => {
+            const secondPromise = new Promise((resolve, reject) => {
+                secondaryCourts = chunkArray(availablePlayers.filter(player => player[3] !== 'Waiting'), courtDivision)
+                console.log(secondaryCourts.length)
+                courts = courts.map((court, index) => {
+                  court = court.concat(secondaryCourts[index])
+                  return court
+                })
+                resolve("")
+            }).then(resp => {
+                let currentCourt = 1
+                const maxCount = courtDivision < courtsAvailable? (currentCourt + 4 * courtDivision) - 1 : 4
+                for (let court of courts) {
+                    if (court.length < 4) continue
+                    setGamesStandard(court, courtsAvailable, currentCourt, false, maxCount)
+                    currentCourt += courtDivision < courtsAvailable? 4 * courtDivision : 4
+                }
+
+            })
+
+        })
+
+    }
+
+    function setGamesGradedOld(availablePlayers, courtsAvailable) {
         let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
         if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
         availablePlayers = availablePlayers.sort(compareDivisions)
@@ -325,10 +406,10 @@
         let lastDivision = parseInt(availablePlayers[0][1])
         const playerCount = availablePlayers.length
 
-        let maxPlayersPerGroup = playerCount / courtsAvailable > 4? (playerCount / courtsAvailable) + Math.floor(playerCount % courtsAvailable) : 4
-        
-        if (playerCount / maxPlayersPerGroup < 4){
-          maxPlayersPerGroup = Math.floor(playerCount / 4)
+        let maxPlayersPerGroup = playerCount / courtsAvailable > 4 ? (playerCount / courtsAvailable) + Math.floor(playerCount % courtsAvailable) : 4
+
+        if (playerCount / maxPlayersPerGroup < 4) {
+            maxPlayersPerGroup = Math.floor(playerCount / 4)
         }
         availablePlayers.map(player => {
             let division = player[1]
@@ -342,25 +423,25 @@
         })
         let currentCourt = 1
         lastDivision = parseInt(availablePlayers[0][1])
-        
         Object.values(grades).map((division, index) => {
-          
-          if (index > 1) {
-            if (grades[index + 1].length > 0 && grades[lastDivision].length < maxPlayersPerGroup && grades[lastDivision].length <= 4 + Math.floor(playerCount % courtsAvailable)) {
-              
-              while (grades[lastDivision].length < 4 + (playerCount % courtsAvailable) && grades[index + 1].length > 0) {
-                grades[lastDivision].push(grades[index+1].shift())
-              }
-              if (grades[index+1].length > 0 ) lastDivision = index+1
-            } else {
-              lastDivision = index + 1
+            grades[index] = division.sort(comparePlayCounts)
+        })
+        Object.values(grades).map((division, index) => {
+            if (index > 1 && index < grades.length) {
+                if (grades[index + 1].length > 0 && grades[lastDivision].length < maxPlayersPerGroup && grades[lastDivision].length <= 4 + Math.floor(playerCount % courtsAvailable)) {
+
+                    while (grades[lastDivision].length < 4 + (playerCount % courtsAvailable) && grades[index + 1].length > 0) {
+                        grades[lastDivision].push(grades[index + 1].shift())
+                    }
+                    if (grades[index + 1].length > 0) lastDivision = index + 1
+                } else {
+                    lastDivision = index + 1
+                }
             }
-          } 
         })
         for (let division of Object.values(grades)) {
             if (division.length == 0) continue
-            
-            setGamesStandard(division, courtsAvailable, currentCourt)
+            setGamesStandard(division, courtsAvailable, currentCourt, false)
             currentCourt += 4
         }
         // setTable()
@@ -394,17 +475,20 @@
 
     function setTable() {
         document.getElementById("tableRows").innerHTML = ""
+        document.getElementById("tableRowsAttending").innerHTML = ""
         window.localStorage.setItem('players', JSON.stringify(players))
         let playerRows = ''
-        players.map((player, index) => {
+        let playerRowsAttending = ''
+        players.sort((a, b) => a[0].localeCompare(b[0])).map((player, index) => {
             if (player[4]) {
-                playerRows += `<tr><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Attending</span></td><td></tr>`
+                playerRowsAttending += `<tr><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Set Not Attending</span></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
             } else {
-                playerRows += `<tr><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Not Attending</span></td><td></tr>`
+                playerRows += `<tr><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Set Attending</span></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
             }
         })
 
         document.getElementById("tableRows").innerHTML = playerRows
+        document.getElementById("tableRowsAttending").innerHTML = playerRowsAttending
     }
 
     function toggleAttending(index) {
@@ -441,7 +525,6 @@
     }
 
     const fileInput = document.getElementById('csv')
-    let attending = ['Anna Slevin','John Levesley','Arunachalam Sivaprakasam','Nitin Paliwal','Apoorv Purohit','Shozaib Rangoonwala','Priyam Bhadauria','Ketki Keskar','Haseeb Ahmed','Tim OFlynn',"Marie O'Flynn",'Emma Lyons','John Hampson','Adrian Barbour','Shweta Bhagat','Adil Qureshi','Fiona Hawkshaw','Kamrul Hasan']
     const readFile = () => {
         const reader = new FileReader()
         reader.onload = () => {
@@ -449,7 +532,7 @@
             Promise.all(reader.result.split('ï»¿').join('').split('\r').join('').split('\n').map(row => {
                 let player = row.split(',')
                 if (player.length > 1) {
-                    players.push([player[0], player[1], 0, 'Waiting', attending.includes(player[0])])
+                    players.push([player[0], player[1], 0, 'Waiting', false])
                 }
             })).then(setTable())
 
