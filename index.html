@@ -257,9 +257,7 @@
     </div>
     <script>
     let players = [];
-    // if (window.localStorage.getItem('players')) {
-    //   players = JSON.parse(window.localStorage.getItem('players'))
-    // }
+    let captained = {};
 
     setTable(players)
 
@@ -267,8 +265,10 @@
         players = players.map(player => {
             player[3] = 'Waiting'
             player[2] = 0
+            player[5] = {}
             return player;
         })
+        captained = {}
         window.localStorage.setItem('players', JSON.stringify(players))
         setTable()
         setGames()
@@ -281,7 +281,7 @@
     }
 
     function comparePlayCounts(a, b) {
-        return a[2] - b[2]  || Math.random() - Math.random();
+        return a[2] - b[2] || Math.random() - Math.random();
     }
 
     function comparePlayerNames(a, b) {
@@ -289,18 +289,35 @@
     }
 
     function compareDivisions(a, b) {
-        return parseInt(a[1]) - parseInt(b[1]) || a[2] - b[2] || Math.random() - Math.random() ;
+        return parseInt(a[1]) - parseInt(b[1]) || a[2] - b[2] || Math.random() - Math.random();
+    }
+
+    function setPlayersPlayed(player, availablePlayers) {
+      for (let otherPlayer of availablePlayers) {
+        if (otherPlayer[0] !== player[0]) {
+          player[5][otherPlayer[0]] = otherPlayer[0] in player[5] ? player[5][otherPlayer[0]] : 0
+        }
+      }
+      return player
+    }
+
+    function setCaptains(){
+      players.filter(player => player[4]).map(player => {
+        captained[player[0]] = player[0] in captained? captained[player[0]] : 0
+      })
     }
 
     function setGames() {
         let s = [...Array(32)].map((_, i) => document.getElementById("player" + (i + 1)).innerHTML = '')
         let availablePlayers = players.filter(player => player[4])
+        players = players.map(player => setPlayersPlayed(player, availablePlayers))
+        setCaptains()
         let courtsAvailable = document.getElementById("courtsAvailable").value || 4;
         if (parseInt(courtsAvailable) > 8) {
             courtsAvailable = 8
             document.getElementById("courtsAvailable").value = 8
         }
-        // console.log(courtsAvailable)
+        
         let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
         if (document.getElementById('graded').checked) {
             setGamesGraded(availablePlayers, courtsAvailable)
@@ -310,8 +327,48 @@
         let u = [...Array(parseInt(courtsAvailable))].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "block")
     }
 
+    function shiftArrayToRight(arr, places) {
+        for (let i = 0; i < places; i++) {
+            arr.unshift(arr.pop());
+        }
+        return arr
+    }
+
+
+    function getPlayersLeastPlayed(playersArray, allowedPlayers) {
+      const sortedCaptains = Object.keys(captained).filter(captain => allowedPlayers.includes(captain)).sort(function(a,b){return captained[a]-captained[b] || Math.random() - Math.random()}).splice(0,4)
+      
+      let captainTeams = {}
+      for (let captain of sortedCaptains) {
+        captainTeams[captain] = []
+      }
+      let alreadySet = []
+      playersArray.map(player => {
+
+        if (!alreadySet.includes(player[0]) && sortedCaptains.includes(player[0])) {
+          alreadySet.push(player[0])
+          captained[player[0]] = player[0] in captained? captained[player[0]] + 1 : 1
+          const sortedPlayers = Object.keys(player[5]).sort(function(a,b){return player[5][a]-player[5][b] || Math.random() - Math.random()})
+          let addedCount = 0
+          sortedPlayers.map(next => {
+            if (!alreadySet.includes(next) && !sortedCaptains.includes(next) && allowedPlayers.includes(next) && addedCount < 3) {
+              alreadySet.push(next)
+              captainTeams[player[0]].push(next)
+              addedCount += 1
+            }
+          })
+        }
+      })
+      let finalSet = []
+      Object.keys(captainTeams).map(captain => {
+        finalSet.push(captain)
+        finalSet = finalSet.concat(captainTeams[captain])
+      })
+      return [...new Set(finalSet)]
+    }
+
     function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, performShuffle = true, maxCount = null) {
-        
+
         const availablePlayersNames = availablePlayers.map(player => player[0])
 
         let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
@@ -320,24 +377,50 @@
         availablePlayers = availablePlayers.sort(comparePlayCounts)
         let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
         if (playersForGames.length < maxPlayers) {
-            playersForGames = playersForGames.concat(getNext(availablePlayers.filter(player => !playersForGames.includes(player[0]))).slice(0, maxPlayers - playersForGames.length).map(player => player[0]))
+            playersForGames = playersForGames.concat(
+              getNext(availablePlayers.filter(player => !playersForGames.includes(player[0])))
+              .slice(0, maxPlayers - playersForGames.length)
+              .map(player => player[0]))
         }
 
-        // [...Array(16)].map((_, i) => document.getElementById("player" + (i + 1)).innerHTML = '')
-        if (performShuffle) {
-            playersForGames = shuffle(playersForGames)
-        }
-
+        courts = [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
         playersForGames = playersForGames.slice(0, maxPlayers);
-        console.log(maxPlayers)
+        if (performShuffle) {
+            playersForGames = shuffle(playersForGames);
+            playersForGames = getPlayersLeastPlayed(players.filter(player => playersForGames.includes(player[0])), playersForGames)
+        }
+        current_court = 0;        
+        
         playersForGames.map((player, index) => {
+            if (index != 0 && index % 4 === 0) {
+                current_court += 1
+            }
+            courts[current_court].push(player)
             document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
         })
+
 
         players = players.map(player => {
             if (availablePlayersNames.includes(player[0])) {
                 player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
                 player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
+                for (let court of courts) {
+                    if (court.includes(player[0])) {
+                        for (let other of court) {
+                            if (other === player[0]) continue
+                            player[5][other] = other in player[5] ? player[5][other] + 1 : 1
+                        }
+                    }
+                }
             }
             return player
         })
@@ -345,11 +428,10 @@
     }
 
     function chunkArray(arr, n) {
-      const size = Math.round(arr.length / n);
-      console.log(size, arr.length)
-      return Array.from({ length: n }, (v, i) =>
-        arr.slice(i * size, i * size + size)
-      );
+        const size = Math.round(arr.length / n);
+        return Array.from({ length: n }, (v, i) =>
+            arr.slice(i * size, i * size + size)
+        );
     }
 
     function setGamesGraded(availablePlayers, courtsAvailable) {
@@ -357,8 +439,8 @@
         let courts = []
         let secondaryCourts = []
 
-        let courtDivision = Math.floor(courtsAvailable%2) == 0 && courtsAvailable > 2 ? Math.floor(courtsAvailable/2) : parseInt(courtsAvailable)
-        
+        let courtDivision = Math.floor(courtsAvailable % 2) == 0 && courtsAvailable > 2 ? Math.floor(courtsAvailable / 2) : parseInt(courtsAvailable)
+
         while (courts.length < courtDivision) {
             courts.push([])
             secondaryCourts.push([])
@@ -370,7 +452,6 @@
         const firstPromise = new Promise((resolve, reject) => {
             let courtIndex = 0
             courts = chunkArray(availablePlayers.filter(player => player[3] === 'Waiting'), courtDivision)
-            console.log(courts.length)
             resolve("")
         })
         firstPromise.then((ret) => {
@@ -378,17 +459,17 @@
                 secondaryCourts = chunkArray(availablePlayers.filter(player => player[3] !== 'Waiting'), courtDivision)
                 console.log(secondaryCourts.length)
                 courts = courts.map((court, index) => {
-                  court = court.concat(secondaryCourts[index])
-                  return court
+                    court = court.concat(secondaryCourts[index])
+                    return court
                 })
                 resolve("")
             }).then(resp => {
                 let currentCourt = 1
-                const maxCount = courtDivision < courtsAvailable? (currentCourt + 4 * courtDivision) - 1 : 4
+                const maxCount = courtDivision < courtsAvailable ? (currentCourt + 4 * courtDivision) - 1 : 4
                 for (let court of courts) {
                     if (court.length < 4) continue
                     setGamesStandard(court, courtsAvailable, currentCourt, false, maxCount)
-                    currentCourt += courtDivision < courtsAvailable? 4 * courtDivision : 4
+                    currentCourt += courtDivision < courtsAvailable ? 4 * courtDivision : 4
                 }
 
             })
@@ -453,21 +534,10 @@
     }
 
     function shuffle(array) {
-        let currentIndex = array.length,
-            randomIndex;
+        array = array.map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value)
 
-        // While there remain elements to shuffle.
-        while (currentIndex > 0) {
-
-            // Pick a remaining element.
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-
-            // And swap it with the current element.
-            [array[currentIndex], array[randomIndex]] = [
-                array[randomIndex], array[currentIndex]
-            ];
-        }
 
         return array;
     }
@@ -499,13 +569,12 @@
     function processForm(e) {
         if (e.preventDefault) e.preventDefault();
 
-        /* do what you want with the form */
         const playerName = document.getElementById("newPlayer").value;
-        const playerDivision = document.getElementById("newPlayerDivision").value;
+        const playerDivision = parseFloat(document.getElementById("newPlayerDivision").value);
         if (playerName && playerDivision) {
             document.getElementById("newPlayer").value = null;
             document.getElementById("newPlayerDivision").value = null;
-            document.getElementById("formWarning").innerHTML = ""
+            document.getElementById("formWarning").innerHTML = "";
             players.push([playerName, playerDivision, 0, 'Waiting', false])
         } else {
             document.getElementById("formWarning").innerHTML = "Please add player name and division";
@@ -513,7 +582,6 @@
 
         setTable()
 
-        // You must return false to prevent the default form behavior
         return false;
     }
 
@@ -532,12 +600,11 @@
             Promise.all(reader.result.split('ï»¿').join('').split('\r').join('').split('\n').map(row => {
                 let player = row.split(',')
                 if (player.length > 1) {
-                    players.push([player[0], player[1], 0, 'Waiting', false])
+                    players.push([player[0], parseFloat(player[1]), 0, 'Waiting', false, {}])
                 }
             })).then(setTable())
 
         }
-        // start reading the file. When it is done, calls the onload event defined above.
         reader.readAsBinaryString(fileInput.files[0])
     }
 
