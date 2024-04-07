@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     <style>
-    .container {
+        .container {
         margin-top: 50px;
     }
 
@@ -83,43 +83,129 @@
 </head>
 
 <body style="max-width: 90vw; margin-left:8px">
-
-  <h2>Tournament Organiser</h2>
-  <button type="button" class="btn btn-primary">Add Division</button>
-  <div class="col-12">
-    <div class="row align-items-start" id="divisionBlock" style="min-height: 150px;">
-
+    <h2>Tournament Organiser</h2>
+    <div class="row align-items-start">
+        <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
+        <div class="col-sm-12 col-md-4 pl-4">
+            <input type="string" class="form-control" id="newDivision" name="newDivision" placeholder="Type Division number">
+        </div>
+        <div class="col-sm-12 col-md-4 pl-4 float-left">
+            <button type="button" class="btn btn-primary form-control" onclick="addDivision()">Add Division</button>
+        </div>
     </div>
-    
-  </div>
+    <div class="row align-items-start ml-4">
+        <div class="col-12">
+            <div class="row align-items-start" id="divisionBlock" style="min-height: 150px;">
+            </div>
+        </div>
+    </div>
+    <script>
+    let divisions = []
 
-  <script>
-    let divisions = [{"name": "Div 6", "teams": [{"p1": "test", "p2": "test", "setsWon": 1, "setsLost": 0, "pointsDifference": -3}]}]
+    function setDivisionTable(teams, results) {
+        if (teams.length = 4) return setFourTeamTournament(teams, results)
+    }
 
+    function setFourTeamTournament(teams, results) {
+        return `
+        <table class="table">
+          <thead><th>Team 1</th><th>Team 2</th><th>Sets</th><th>Points</th><th></th></thead>
+          <tbody>
+            <tr>
+              <td>${teams[0].p1}<br/>${teams[0].p2}</td>
+              <td>${teams[3].p1}<br/>${teams[3].p2}</td><td>${results[0]?.sets? results[0]?.sets : ''}</td><td>${results[0]?.points? results[0]?.points : ''}</td><td></td>
+            </tr>
+            <tr>
+              <td>${teams[1].p1}<br/>${teams[1].p2}</td><td>${teams[2].p1}<br/>${teams[2].p2}</td><td>${results[1]?.sets? results[1]?.sets : ''}</td><td>${results[1]?.points? results[1]?.points : ''}</td><td></td>
+            </tr>
+            <tr>
+              <td>${teams[0].p1}<br/>${teams[0].p2}</td><td>${teams[2].p1}<br/>${teams[2].p2}</td><td>${results[2]?.sets? results[2]?.sets : ''}</td><td>${results[2]?.points? results[2]?.points : ''}</td><td></td>
+            </tr>
+            <tr>  
+              <td>${teams[1].p1}<br/>${teams[1].p2}</td><td>${teams[3].p1}<br/>${teams[3].p2}</td><td>${results[3]?.sets? results[3]?.sets : ''}</td><td>${results[3]?.points? results[3]?.points : ''}</td><td></td>
+            </tr>
+            <tr>
+              <td>${teams[0].p1}<br/>${teams[0].p2}</td><td>${teams[1].p1}<br/>${teams[1].p2}</td><td>${results[4]?.sets? results[4]?.sets : ''}</td><td>${results[4]?.points? results[4]?.points : ''}</td><td></td>
+            </tr>
+            <tr>  
+              <td>${teams[2].p1}<br/>${teams[2].p2}</td><td>${teams[3].p1}<br/>${teams[3].p2}</td><td>${results[5]?.sets? results[5]?.sets : ''}</td><td>${results[5]?.points? results[5]?.points : ''}</td><td></td>
+            </tr>
+          </tbody>
+      `
+    }
 
     function setDivisions() {
-      const divisionBlocks = divisions.map(division => {
-        const teams = division.teams?.sort(function(a, b) { return a.setsWon - b.setsWon || a.pointsDifference - b.pointsDifference }).map(team => {
-          return `<tr><td>${team.p1}</td><td>${team.p2}</td><td>${team.p1}</td><td>${team.setsWon}</td><td>${team.setsLost}</td><td>${team.pointsDifference}</td></tr>`
-        })
-        return `
-          <div class="col-sm-12 col-md-3 card">
-            <h4>
-              ${division.name}
-            </h4>
-            <button type="button" class="btn btn-primary pull-right">Add team</button>
-            <table>
-              <thead><th>Player 1</th><th>Player 2</th><th>Sets For</th><th>Sets Against</th><th>Points Difference</th></thead>
-              <tbody></tbody>
+        const divisionBlocks = divisions.map((division, index) => {
+            const teams = division.teams ? .sort(function(a, b) { return a.setsWon - b.setsWon || a.pointsDifference - b.pointsDifference }).map((team, teamIndex) => {
+                return `<tr><td>${team.p1}</td><td>${team.p2}</td><td>${team.setsWon}</td><td>${team.setsLost}</td><td>${team.pointsDifference}</td><td>
+            <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="removeTeam(${index}, ${teamIndex})">X</button>
+          </td></tr>`
+            })
+            let newTeamBlock = ''
+            let matchesBlock = ''
+            if (!division.started) {
+                newTeamBlock = `<input type="string" class="form-control" style="margin-bottom: 5px" id="playerOne${index}" name="playerOne" placeholder="Type Player One Name">
+            <input type="string" class="form-control" style="margin-bottom: 5px" id="playerTwo${index}" name="playerTwo" placeholder="Type Player Two Name">
+            <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="addTeam(${index})">Add team</button>`
+            } else {
+                matchesBlock = setDivisionTable(division.teams, division.results)
+            }
+            const disabled = division.teams ? .length <= 2 ? 'disabled' : '';
+            return `<div class="col-sm-12 col-md-3 card" style="margin-top: 30px; margin-left:20px">
+            <div class="row">
+              <h4 style="padding-top: 15px; float: left" class="col-6">
+                ${division.name}
+              </h4>
+              <div style="padding-top: 15px; float: left" class="col-6">
+                <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" ${disabled} onclick="startDivision(${index})">Start</button>
+              </div>
+            </div>
+            <h4 id="divisionPlayerWarning${index}" style="text-align: left; padding-top: 5px"></h4>
+            ${newTeamBlock}
+            <table class="table">
+              <thead><th>Player 1</th><th>Player 2</th><th>Sets For</th><th>Sets Against</th><th>Points Difference</th><th></th></thead>
+              <tbody>${teams.join('')}</tbody>
             </table>
+            ${matchesBlock}
           </div>`
-      })
-      document.getElementById("divisionBlock").innerHTML = divisionBlocks;
+        })
+        document.getElementById("divisionBlock").innerHTML = divisionBlocks.join('');
+    }
+
+    function addDivision() {
+        const divisionName = document.getElementById("newDivision").value;
+        if (!divisionName) {
+            document.getElementById("divisionFormWarning").innerHTML = "Please add the name of the division";
+            return
+        }
+        divisions.push({ "name": divisionName, "teams": [], "results": [], "started": false })
+        document.getElementById("newDivision").value = ''
+        setDivisions()
+    }
+
+    function addTeam(divisionIndex) {
+        const playerOne = document.getElementById('playerOne' + divisionIndex).value;
+        const playerTwo = document.getElementById('playerTwo' + divisionIndex).value;
+        if (!playerOne && playerTwo) {
+            document.getElementById("divisionPlayerWarning" + divisionIndex).innerHTML = "Please add both player names";
+        }
+        const team = { "p1": playerOne, "p2": playerTwo, "setsWon": 0, "setsLost": 0, "pointsDifference": 0 }
+        divisions[divisionIndex].teams.push(team)
+        setDivisions()
+    }
+
+    function removeTeam(divisionIndex, teamIndex) {
+        divisions[divisionIndex].teams.splice(teamIndex, 1)
+        setDivisions()
+    }
+
+    function startDivision(divisionIndex) {
+        divisions[divisionIndex].started = true;
+        setDivisions()
     }
 
     setDivisions()
-  </script>
-
+    </script>
 </body>
 
 </html>
