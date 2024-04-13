@@ -13,6 +13,11 @@
         margin-top: 50px;
     }
 
+    .scroll-div {
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
     .hover:hover {
         cursor: pointer;
     }
@@ -79,6 +84,34 @@
     .slider.round:before {
         border-radius: 50%;
     }
+
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50vw;
+      min-height: 300px;
+    }
+
+    .big-margin {
+      margin-top: 50px;
+    }
     </style>
 </head>
 
@@ -99,75 +132,285 @@
             </div>
         </div>
     </div>
-    <script>
-    let divisions = []
+    <div id="myModal" class="modal">
 
-    function setDivisionTable(teams, results) {
-        if (teams.length = 4) return setFourTeamTournament(teams, results)
+      <!-- Modal content -->
+      <div class="modal-content">
+        <p>Input the scores for the match below</p>
+        <div class="row align-items-start">
+          <div class="col-sm-12 col-md-6 pl-4">
+            <div id="teamOneModal"></div>
+          </div>
+          <div class="col-sm-12 col-md-6 pl-4">
+            <div id="teamTwoModal"></div>
+          </div>
+        </div>
+        <div class="row align-items-start">
+          <div class="col-sm-12 col-md-6 pl-4">
+              <input type="integer" class="form-control" id="teamOneSets" name="teamOneSets" placeholder="Type Team One Sets...">
+          </div>
+          <div class="col-sm-12 col-md-4 pl-4">
+              <input type="integer" class="form-control" id="teamTwoSets" name="teamTwoSets" placeholder="Type Team Two Sets...">
+          </div>
+        </div>
+        <div class="row align-items-start">
+          <div class="col-sm-12 col-md-6 pl-4">
+              <input type="integer" class="form-control" id="teamOnePoints" name="teamOnePoints" placeholder="Type Team One Points...">
+          </div>
+          <div class="col-sm-12 col-md-4 pl-4">
+              <input type="integer" class="form-control" id="teamTwoPoints" name="teamTwoPoints" placeholder="Type Team Two Points...">
+          </div>
+        </div>
+        <div class="row big-margin">
+          <div class="col-sm-4 col-md-4 pl-4">
+            <button type="button" class="btn btn-secondary form-control" onclick="closeModal()">Cancel</button>
+          </div>
+          <div class="col-sm-4 col-md-4 pl-4">
+          </div>
+          <div class="col-sm-4 col-md-4 pl-4 pull-right">
+            <button type="button" class="btn btn-primary form-control" onclick="applyScore()">Save</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <script>
+    let divisions = [
+        {
+            "name": "1",
+            "teams": [
+                {
+                    "p1": "1",
+                    "p2": "2",
+                    "setsWon": 0,
+                    "setsLost": 0,
+                    "pointsDifference": 0,
+                    "gamesPlayed": 0
+                },
+                {
+                    "p1": "3",
+                    "p2": "4",
+                    "setsWon": 0,
+                    "setsLost": 0,
+                    "pointsDifference": 0,
+                    "gamesPlayed": 0
+                },
+                {
+                    "p1": "5",
+                    "p2": "6",
+                    "setsWon": 0,
+                    "setsLost": 0,
+                    "pointsDifference": 0,
+                    "gamesPlayed": 0
+                },
+                {
+                    "p1": "7",
+                    "p2": "8",
+                    "setsWon": 0,
+                    "setsLost": 0,
+                    "pointsDifference": 0,
+                    "gamesPlayed": 0
+                }
+            ],
+            "results": [],
+            "started": false
+        }
+    ]
+    var modal = document.getElementById("myModal");
+    let currentResultDetails = {divisionIndex: null, resultIndex: null, isUpdate: false}
+
+
+    function setDivisionTable(teams, results, divisionIndex) {
+        if (results.length > 0) return {results: results, table: setGamesTable(results, divisionIndex)}
+        if (teams.length == 4) return setFourTeamTournament(teams, divisionIndex)
+        if (teams.length == 5) return setFiveTeamTournament(teams, divisionIndex)
+        if (teams.length == 6) return setSixTeamTournament(teams, divisionIndex)
+        if (teams.length == 7) return setSevenTeamTournament(teams, divisionIndex)
+        if (teams.length == 8) return setEightTeamTournament(teams, divisionIndex)
     }
 
-    function setFourTeamTournament(teams, results) {
-        return `
-        <table class="table">
+    function setFourTeamTournament(teams, divisionIndex) {
+        let results = [
+          {teamOne: teams[0], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        ]
+        return {results:results, table: setGamesTable(results, divisionIndex)} 
+    }
+
+    function setFiveTeamTournament(teams, divisionIndex) {
+        let results = [
+          {teamOne: teams[4], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        ]
+        return {results:results, table: setGamesTable(results, divisionIndex)} 
+    }
+
+    function setSixTeamTournament(teams, divisionIndex) {
+        let results = [
+          {teamOne: teams[5], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[5], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        ]
+        return {results:results, table: setGamesTable(results, divisionIndex)} 
+    }
+
+    function setSevenTeamTournament(teams, divisionIndex) {
+        let results = [
+          {teamOne: teams[6], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[5], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[6], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[5], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        ]
+        return {results:results, table: setGamesTable(results, divisionIndex)} 
+    }
+
+    function setEightTeamTournament(teams, divisionIndex) {
+        let results = [
+          {teamOne: teams[0], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[5], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[5], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[6], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        ]
+        return {results:results, table: setGamesTable(results, divisionIndex)} 
+    }
+
+    function setGamesTable(results, divisionIndex){
+    return `
+        <table class="table table-striped table-dark">
           <thead><th>Team 1</th><th>Team 2</th><th>Sets</th><th>Points</th><th></th></thead>
           <tbody>
-            <tr>
-              <td>${teams[0].p1}<br/>${teams[0].p2}</td>
-              <td>${teams[3].p1}<br/>${teams[3].p2}</td><td>${results[0]?.sets? results[0]?.sets : ''}</td><td>${results[0]?.points? results[0]?.points : ''}</td><td></td>
-            </tr>
-            <tr>
-              <td>${teams[1].p1}<br/>${teams[1].p2}</td><td>${teams[2].p1}<br/>${teams[2].p2}</td><td>${results[1]?.sets? results[1]?.sets : ''}</td><td>${results[1]?.points? results[1]?.points : ''}</td><td></td>
-            </tr>
-            <tr>
-              <td>${teams[0].p1}<br/>${teams[0].p2}</td><td>${teams[2].p1}<br/>${teams[2].p2}</td><td>${results[2]?.sets? results[2]?.sets : ''}</td><td>${results[2]?.points? results[2]?.points : ''}</td><td></td>
-            </tr>
-            <tr>  
-              <td>${teams[1].p1}<br/>${teams[1].p2}</td><td>${teams[3].p1}<br/>${teams[3].p2}</td><td>${results[3]?.sets? results[3]?.sets : ''}</td><td>${results[3]?.points? results[3]?.points : ''}</td><td></td>
-            </tr>
-            <tr>
-              <td>${teams[0].p1}<br/>${teams[0].p2}</td><td>${teams[1].p1}<br/>${teams[1].p2}</td><td>${results[4]?.sets? results[4]?.sets : ''}</td><td>${results[4]?.points? results[4]?.points : ''}</td><td></td>
-            </tr>
-            <tr>  
-              <td>${teams[2].p1}<br/>${teams[2].p2}</td><td>${teams[3].p1}<br/>${teams[3].p2}</td><td>${results[5]?.sets? results[5]?.sets : ''}</td><td>${results[5]?.points? results[5]?.points : ''}</td><td></td>
-            </tr>
+            ${results.map((result, resultIndex) => {
+              let btn = ''
+              if (!result.completed) {
+                btn = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="openApplyScore(${divisionIndex}, ${resultIndex}, false)">Score</button>`
+              } else {
+                btn = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="openApplyScore(${divisionIndex}, ${resultIndex}, true)">Update</button>`
+              }
+              return (
+                `<tr>
+                  <td>${result.teamOne.p1}<br/>${result.teamOne.p2}</td>
+                  <td>${result.teamTwo.p1}<br/>${result.teamTwo.p2}</td>
+                  <td>Team One: ${result.sets.teamOne} <br/>Team Two: ${result.sets.teamTwo}</td>
+                  <td>Team One: ${result.points.teamOne} <br/>Team Two: ${result.points.teamTwo}</td>
+                  <td>${btn}</td>
+                </tr>`
+              )
+            }).join('')}
           </tbody>
+        </table>
       `
     }
 
     function setDivisions() {
         const divisionBlocks = divisions.map((division, index) => {
-            const teams = division.teams ? .sort(function(a, b) { return a.setsWon - b.setsWon || a.pointsDifference - b.pointsDifference }).map((team, teamIndex) => {
-                return `<tr><td>${team.p1}</td><td>${team.p2}</td><td>${team.setsWon}</td><td>${team.setsLost}</td><td>${team.pointsDifference}</td><td>
-            <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="removeTeam(${index}, ${teamIndex})">X</button>
-          </td></tr>`
+            const teams = division.teams?.sort(function(a, b) { return b.setsWon - a.setsWon || b.pointsDifference - a.pointsDifference }).map((team, teamIndex) => {
+              let removeButton = ''
+              if (!division.started){
+                removeButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="removeTeam(${index}, ${teamIndex})">X</button>`
+              }
+              return `
+                <tr>
+                  <td>${team.p1}</td>
+                  <td>${team.p2}</td>
+                  <td>${team.setsWon}</td>
+                  <td>${team.setsLost}</td>
+                  <td>${team.pointsDifference}</td>
+                  <td>${team.gamesPlayed}</td>
+                  <td>${removeButton}</td>
+                </tr>`
             })
             let newTeamBlock = ''
             let matchesBlock = ''
+            let finalRounds = ''
             if (!division.started) {
-                newTeamBlock = `<input type="string" class="form-control" style="margin-bottom: 5px" id="playerOne${index}" name="playerOne" placeholder="Type Player One Name">
-            <input type="string" class="form-control" style="margin-bottom: 5px" id="playerTwo${index}" name="playerTwo" placeholder="Type Player Two Name">
-            <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="addTeam(${index})">Add team</button>`
+                newTeamBlock = `
+                  <div class="col-4">
+                    <input type="string" class="form-control" style="margin-bottom: 5px" id="playerOne${index}" name="playerOne" placeholder="Type Player One Name">
+                  </div>
+                  <div class="col-4">
+                    <input type="string" class="form-control" style="margin-bottom: 5px" id="playerTwo${index}" name="playerTwo" placeholder="Type Player Two Name">
+                  </div>
+                  <div class="col-4">
+                    <button type="button" class="form-control btn btn-success pull-right" style="margin-bottom: 5px" onclick="addTeam(${index})">Add team</button>
+                  </div>`
             } else {
-                matchesBlock = setDivisionTable(division.teams, division.results)
+                const divisionResultResponse = setDivisionTable(division.teams, division.results, index)
+                matchesBlock = divisionResultResponse.table;
+                divisions[index].results = divisionResultResponse.results;
+                finalRounds = divisionResultResponse.finalRounds;
             }
-            const disabled = division.teams ? .length <= 2 ? 'disabled' : '';
-            return `<div class="col-sm-12 col-md-3 card" style="margin-top: 30px; margin-left:20px">
-            <div class="row">
-              <h4 style="padding-top: 15px; float: left" class="col-6">
-                ${division.name}
-              </h4>
-              <div style="padding-top: 15px; float: left" class="col-6">
-                <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" ${disabled} onclick="startDivision(${index})">Start</button>
-              </div>
-            </div>
-            <h4 id="divisionPlayerWarning${index}" style="text-align: left; padding-top: 5px"></h4>
-            ${newTeamBlock}
-            <table class="table">
-              <thead><th>Player 1</th><th>Player 2</th><th>Sets For</th><th>Sets Against</th><th>Points Difference</th><th></th></thead>
-              <tbody>${teams.join('')}</tbody>
-            </table>
-            ${matchesBlock}
-          </div>`
+            const disabled = division.teams?.length <= 2 || division.results?.length > 0? 'disabled' : '';
+            return `
+              <div class="col-sm-12 card" style="margin-top: 30px; margin-left:20px">
+                <div class="row">
+                  <h4 style="padding-top: 15px; float: left" class="col-9">
+                    ${division.name}
+                  </h4>
+                  <div style="padding-top: 15px; float: left" class="col-3">
+                    <button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" ${disabled} onclick="startDivision(${index})">Start</button>
+                  </div>
+                </div>
+                <h4 id="divisionPlayerWarning${index}" style="text-align: left; padding-top: 5px"></h4>
+                <div class="row">
+                  ${newTeamBlock}
+                </div>
+                <div class="row">
+                  <div class="col-4">
+                  <h4>Table</h4>
+                    <table class="table table-striped table-dark">
+                      <thead><th>Player 1</th><th>Player 2</th><th>Sets For</th><th>Sets Against</th><th>Points Difference</th><th>Games Played</th><th></th></thead>
+                      <tbody>${teams.join('')}</tbody>
+                    </table>
+                  </div>
+                  <div class="col-4 scroll-div">
+                  <h4>First Round Matches</h4>
+                    ${matchesBlock}
+                  </div>
+                  <div class="col-4 scroll-div">
+                    <h4>Final Round Matches</h4>
+                    ${finalRounds}
+                  </div>
+                </div>
+              </div>`
         })
         document.getElementById("divisionBlock").innerHTML = divisionBlocks.join('');
     }
@@ -189,7 +432,7 @@
         if (!playerOne && playerTwo) {
             document.getElementById("divisionPlayerWarning" + divisionIndex).innerHTML = "Please add both player names";
         }
-        const team = { "p1": playerOne, "p2": playerTwo, "setsWon": 0, "setsLost": 0, "pointsDifference": 0 }
+        const team = { "p1": playerOne, "p2": playerTwo, "setsWon": 0, "setsLost": 0, "pointsDifference": 0, "gamesPlayed": 0}
         divisions[divisionIndex].teams.push(team)
         setDivisions()
     }
@@ -202,6 +445,85 @@
     function startDivision(divisionIndex) {
         divisions[divisionIndex].started = true;
         setDivisions()
+    }
+
+    function applyScore() {
+      const divisionIndex = currentResultDetails.divisionIndex
+      const resultIndex = currentResultDetails.resultIndex
+      const teamOneSets = parseInt(document.getElementById("teamOneSets").value);
+      const teamTwoSets = parseInt(document.getElementById("teamTwoSets").value);
+      const teamOnePoints = parseInt(document.getElementById("teamOnePoints").value);
+      const teamTwoPoints = parseInt(document.getElementById("teamTwoPoints").value);
+
+      if (currentResultDetails.isUpdate) {
+        const oldTeamOneSets = divisions[divisionIndex].results[resultIndex].sets.teamOne
+        const oldTeamTwoSets = divisions[divisionIndex].results[resultIndex].sets.teamTwo
+        const oldTeamOnePoints = divisions[divisionIndex].results[resultIndex].points.teamOne
+        const oldTeamTwoPoints = divisions[divisionIndex].results[resultIndex].points.teamTwo
+
+        divisions[divisionIndex].results[resultIndex].teamOne.setsWon -= oldTeamOneSets
+        divisions[divisionIndex].results[resultIndex].teamTwo.setsWon -= oldTeamTwoSets
+        divisions[divisionIndex].results[resultIndex].teamOne.setsLost -= oldTeamTwoSets
+        divisions[divisionIndex].results[resultIndex].teamTwo.setsLost -= oldTeamOneSets
+        divisions[divisionIndex].results[resultIndex].teamOne.pointsDifference -= oldTeamOnePoints
+        divisions[divisionIndex].results[resultIndex].teamTwo.pointsDifference -= oldTeamTwoPoints
+        divisions[divisionIndex].results[resultIndex].teamOne.pointsDifference += oldTeamTwoPoints
+        divisions[divisionIndex].results[resultIndex].teamTwo.pointsDifference += oldTeamOnePoints
+        divisions[divisionIndex].results[resultIndex].teamOne.gamesPlayed -= 1;
+        divisions[divisionIndex].results[resultIndex].teamTwo.gamesPlayed -= 1;
+      }
+
+      divisions[divisionIndex].results[resultIndex].teamOne.setsWon = !divisions[divisionIndex].results[resultIndex].teamOne.setsWon? teamOneSets : divisions[divisionIndex].results[resultIndex].teamOne.setsWon + teamOneSets;
+      divisions[divisionIndex].results[resultIndex].teamTwo.setsWon = !divisions[divisionIndex].results[resultIndex].teamTwo.setsWon? teamTwoSets : divisions[divisionIndex].results[resultIndex].teamTwo.setsWon + teamTwoSets;
+      divisions[divisionIndex].results[resultIndex].teamOne.setsLost = !divisions[divisionIndex].results[resultIndex].teamOne.setsLost? teamTwoSets : divisions[divisionIndex].results[resultIndex].teamOne.setsLost + teamTwoSets;
+      divisions[divisionIndex].results[resultIndex].teamTwo.setsLost = !divisions[divisionIndex].results[resultIndex].teamTwo.setsLost? teamOneSets : divisions[divisionIndex].results[resultIndex].teamTwo.setsLost + teamOneSets;
+      divisions[divisionIndex].results[resultIndex].teamOne.pointsDifference = !divisions[divisionIndex].results[resultIndex].teamOne.pointsDifference? teamOnePoints - teamTwoPoints : divisions[divisionIndex].results[resultIndex].teamOne.pointsDifference + teamOnePoints - teamTwoPoints;
+      divisions[divisionIndex].results[resultIndex].teamTwo.pointsDifference = !divisions[divisionIndex].results[resultIndex].teamTwo.pointsDifference? teamTwoPoints - teamOnePoints : divisions[divisionIndex].results[resultIndex].teamTwo.pointsDifference + teamTwoPoints - teamOnePoints;
+
+      divisions[divisionIndex].results[resultIndex].teamOne.gamesPlayed += 1;
+      divisions[divisionIndex].results[resultIndex].teamTwo.gamesPlayed += 1;
+
+      divisions[divisionIndex].results[resultIndex].sets.teamOne = teamOneSets;
+      divisions[divisionIndex].results[resultIndex].sets.teamTwo = teamTwoSets;
+      divisions[divisionIndex].results[resultIndex].points.teamOne = teamOnePoints;
+      divisions[divisionIndex].results[resultIndex].points.teamTwo = teamTwoPoints;
+
+      divisions[divisionIndex].results[resultIndex].completed = true
+      setDivisions()
+      closeModal()
+    }
+
+    function openApplyScore(divisionIndex, resultIndex, isUpdate) {
+      
+      currentResultDetails.divisionIndex = divisionIndex;
+      currentResultDetails.resultIndex = resultIndex;
+      currentResultDetails.isUpdate = isUpdate;
+      let match = divisions[divisionIndex].results[resultIndex]
+      document.getElementById("teamOneModal").innerHTML = `${match.teamOne.p1} & ${match.teamOne.p2}`
+      document.getElementById("teamTwoModal").innerHTML = `${match.teamTwo.p1} & ${match.teamTwo.p2}`
+      if (isUpdate) {
+        document.getElementById("teamOneSets").value = divisions[divisionIndex].results[resultIndex].sets.teamOne;
+        document.getElementById("teamTwoSets").value = divisions[divisionIndex].results[resultIndex].sets.teamTwo;
+        document.getElementById("teamOnePoints").value = divisions[divisionIndex].results[resultIndex].points.teamOne;
+        document.getElementById("teamTwoPoints").value = divisions[divisionIndex].results[resultIndex].points.teamTwo;
+      }
+      modal.style.display = "block";
+    }
+
+    function closeModal() {
+      currentResultDetails = {divisionIndex: null, resultIndex: null}
+      document.getElementById("teamOneSets").value = null;
+      document.getElementById("teamTwoSets").value = null;
+      document.getElementById("teamOnePoints").value = null;
+      document.getElementById("teamTwoPoints").value = null;
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        closeModal()
+      }
     }
 
     setDivisions()
