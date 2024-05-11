@@ -15,6 +15,10 @@
       .hover:hover {
         cursor: pointer;
       }
+
+      .ml-4 {
+        margin-left: 3vw;
+      }
       /* The switch - the box around the slider */
       .switch {
         position: relative;
@@ -86,25 +90,27 @@
 " style="max-width: 230px; max-height: 200px;">
     </div>
     <div class="container row">
-      <div class="col-4">
-        <label for="mode">Select Mode:</label>
+      <div class="col-12 ml-4">
+        <div class="col-4">
+          <label for="mode">Select Mode:</label>
 
-        <select name="mode" onchange="setMode(this.value)" id="mode" default="Tournament V1" class="form-select" aria-label="Default select example">
-          <option value="Games V1">Games V1</option>
-          <option value="Games V2">Games V2</option>
-          <!-- <option value="Tournament V1">Tournament V1</option> -->
-        </select>
+          <select name="mode" onchange="setMode(this.value)" id="mode" default="Games V1" class="form-select" aria-label="Default select example">
+            <option value="Games V1">Games V1</option>
+            <option value="Games V2">Games V2</option>
+            <!-- <option value="Tournament V1">Tournament V1</option> -->
+          </select>
+        </div>
       </div>
     </div>
 
-    <div style="margin-bottom: 200px; padding: 50px" id="playSystemV1Container">
-      <object width="100%" height="1000px" style="margin: 20px" type="text/html" data="playSystemV1.html"></object>
+    <div style=""id="playSystemV1Container">
+      <object width="95%" height="1000px" style="" type="text/html" data="playSystemV1.html"></object>
     </div>
-    <div style="margin-bottom: 200px; padding: 50px; display: none;" id="playSystemV2Container">
-      <object width="100%" height="1000px" style="margin: 20px" type="text/html" data="playSystemV2.html"></object>
+    <div style="display: none;" id="playSystemV2Container">
+      <object width="95%" height="1000px" style="" type="text/html" data="playSystemV2.html"></object>
     </div>
-    <div style="margin-bottom: 200px; padding: 50px; display: none;" id="tournamentSystemV1Container">
-      <object width="100%" height="1000px" style="margin: 20px" type="text/html" data="tournamentSystem.html"></object>
+    <div style="display: none;" id="tournamentSystemV1Container">
+      <object width="95%" height="1000px" style="" type="text/html" data="tournamentSystem.html"></object>
     </div>
 
     <script type="text/javascript">
@@ -123,6 +129,7 @@
           document.getElementById("tournamentSystemV1Container").style.display = 'block';
         }
       }
+      setMode(document.getElementById("mode").value)
     </script>
 </body>
 
