@@ -335,43 +335,46 @@
         }
 
         function setGradedPools(availablePlayers, courtsAvailable) {
-          console.log('getting graded pools')
-
+          console.log((gradedGamesCount <= 3 && gradedPools.length === courtsAvailable))
           return new Promise((resolve, reject) => { 
-            if (gradedGamesCount < 4 && !resetPools && gradedPools.length === courtsAvailable) {
-              console.log(gradedPools)
+            if (gradedGamesCount < 4 && gradedPools.length === courtsAvailable) {
+              gradedGamesCount += 1
               resolve(gradedPools)
             }
-            gradedPools = []
-            
-            availablePlayers = availablePlayers.sort(compareDivisionsRandomised)
-            const count = availablePlayers.length
-            const perPool = Math.floor(count / courtsAvailable)
-            let seenPlayers = []
-            bucketPlayers(availablePlayers).then(resp => {
-              
-              
-              let loop = [...Array(courtsAvailable || 4)].map((_, i) => {
-                if (gradedPools.length < i) {
-                  gradedPools.push([])
-                }
-                Object.keys(resp).map(key => {
-                  const block = resp[key]
-                  block.map((player, index) => {
+            else {
+              gradedPools = []
+              gradedGamesCount = 0
 
-                    if (!gradedPools[i]) gradedPools.push([])
-                    if (gradedPools[i].length < perPool) {
-                      if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
-                        gradedPools[i].push(player)
-                        seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
+              availablePlayers = availablePlayers.sort(compareDivisionsRandomised)
+              const count = availablePlayers.length
+              const perPool = Math.floor(count / courtsAvailable)
+              let seenPlayers = []
+              bucketPlayers(availablePlayers).then(resp => {
+                
+                
+                let loop = [...Array(courtsAvailable || 4)].map((_, i) => {
+                  if (gradedPools.length < i) {
+                    gradedPools.push([])
+                  }
+                  Object.keys(resp).map(key => {
+                    const block = resp[key]
+                    block.map((player, index) => {
+
+                      if (!gradedPools[i]) gradedPools.push([])
+                      if (gradedPools[i].length < perPool) {
+                        if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
+                          gradedPools[i].push(player)
+                          seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
+                        }
                       }
-                    }
+                    })
                   })
-                })
-              });
-              resolve(gradedPools)
+                });
+                resolve(gradedPools)
 
-            })
+              })
+            }
+            
           })
         }
 
@@ -388,13 +391,12 @@
 
             let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
             if (document.getElementById('graded').checked) {
-              console.log('going to call for graded pools')
                 setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
                   let courtDivision = resp.length
                   let currentCourt = 1
                   for (let court of resp) {
                       if (court.length < 4) continue
-                      setGamesStandard(court, parseInt(courtsAvailable), currentCourt)
+                      setGamesStandard(court, parseInt(courtsAvailable), currentCourt, true)
                       currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
                   }
                 })
@@ -444,12 +446,15 @@
             return [...new Set(finalSet)]
         }
 
-        function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, performShuffle = true, maxCount = null) {
+        function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, graded=false, performShuffle = true, maxCount = null) {
             console.log(availablePlayers.map(player => player[0]))
             var MAX = 3;
             var rand = Math.floor((Math.random() * MAX) + 1);
             
-            if (true) {
+            if (rand == 2 && !graded) {
+                console.log("resetting players")
+                resetPlayers();
+            } else {
                 const availablePlayersNames = availablePlayers.map(player => player[0])
 
                 let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
