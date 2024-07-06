@@ -335,7 +335,6 @@
         }
 
         function setGradedPools(availablePlayers, courtsAvailable) {
-          console.log((gradedGamesCount <= 3 && gradedPools.length === courtsAvailable))
           return new Promise((resolve, reject) => { 
             if (gradedGamesCount < 4 && gradedPools.length === courtsAvailable) {
               gradedGamesCount += 1
@@ -361,7 +360,7 @@
                     block.map((player, index) => {
 
                       if (!gradedPools[i]) gradedPools.push([])
-                      if (gradedPools[i].length < perPool) {
+                      if (gradedPools[i].length < perPool || i + 1 == courtsAvailable) {
                         if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
                           gradedPools[i].push(player)
                           seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
@@ -396,7 +395,8 @@
                   let currentCourt = 1
                   for (let court of resp) {
                       if (court.length < 4) continue
-                      setGamesStandard(court, parseInt(courtsAvailable), currentCourt, true)
+                      console.log(court.map(player => player[0]))
+                      setGamesStandard(court.sort(comparePlayCounts).slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
                       currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
                   }
                 })
@@ -447,7 +447,7 @@
         }
 
         function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, graded=false, performShuffle = true, maxCount = null) {
-            console.log(availablePlayers.map(player => player[0]))
+            
             var MAX = 3;
             var rand = Math.floor((Math.random() * MAX) + 1);
             
