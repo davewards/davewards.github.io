@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     <style>
-      .container {
+        .container {
         margin: 50px auto;
       }
       .hover:hover {
@@ -290,7 +290,7 @@
         }
 
         function comparePlayCounts(a, b) {
-            return a[2] - b[2] || Math.random() - Math.random();
+            return a[2] - b[2] || b[4] - a[4];
         }
 
         function comparePlayerNames(a, b) {
@@ -321,60 +321,60 @@
         }
 
         function bucketPlayers(availablePlayers) {
-          return new Promise((resolve, reject) => {
-            let buckets = {}
-            availablePlayers.map(player => {
-              if (buckets[Math.floor(player[1])]) {
-                buckets[Math.floor(player[1])].push(player)
-              } else {
-                buckets[Math.floor(player[1])] = [player]
-              }
+            return new Promise((resolve, reject) => {
+                let buckets = {}
+                availablePlayers.map(player => {
+                    if (buckets[Math.floor(player[1])]) {
+                        buckets[Math.floor(player[1])].push(player)
+                    } else {
+                        buckets[Math.floor(player[1])] = [player]
+                    }
+                })
+                resolve(buckets)
             })
-            resolve(buckets)
-          })
         }
 
         function setGradedPools(availablePlayers, courtsAvailable) {
-          return new Promise((resolve, reject) => { 
-            if (gradedGamesCount < 4 && gradedPools.length === courtsAvailable) {
-              gradedGamesCount += 1
-              resolve(gradedPools)
-            }
-            else {
-              gradedPools = []
-              gradedGamesCount = 0
+            return new Promise((resolve, reject) => {
+                if (gradedGamesCount < 4 && gradedPools.length === courtsAvailable) {
+                    gradedGamesCount += 1
+                    resolve(gradedPools)
+                } else {
+                    gradedPools = []
+                    gradedGamesCount = 0
 
-              availablePlayers = availablePlayers.sort(compareDivisionsRandomised)
-              const count = availablePlayers.length
-              const perPool = Math.floor(count / courtsAvailable)
-              let seenPlayers = []
-              bucketPlayers(availablePlayers).then(resp => {
-                
-                
-                let loop = [...Array(courtsAvailable || 4)].map((_, i) => {
-                  if (gradedPools.length < i) {
-                    gradedPools.push([])
-                  }
-                  Object.keys(resp).map(key => {
-                    const block = resp[key]
-                    block.map((player, index) => {
+                    availablePlayers = availablePlayers.sort(compareDivisionsRandomised)
+                    const count = availablePlayers.length
 
-                      if (!gradedPools[i]) gradedPools.push([])
-                      if (gradedPools[i].length < perPool || i + 1 == courtsAvailable) {
-                        if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
-                          gradedPools[i].push(player)
-                          seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
-                        }
-                      }
+                    const perPool = Math.floor(count / courtsAvailable) > 4? Math.floor(count / courtsAvailable): Math.ceil(count / courtsAvailable)
+                    let seenPlayers = []
+                    bucketPlayers(availablePlayers).then(resp => {
+
+
+                        let loop = [...Array(courtsAvailable || 4)].map((_, i) => {
+                            if (gradedPools.length < i) {
+                                gradedPools.push([])
+                            }
+                            Object.keys(resp).map(key => {
+                                const block = resp[key]
+                                block.map((player, index) => {
+
+                                    if (!gradedPools[i]) gradedPools.push([])
+                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable) {
+                                        if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
+                                            gradedPools[i].push(player)
+                                            seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
+                                        }
+                                    }
+                                })
+                            })
+                        });
+                        resolve(gradedPools)
+
                     })
-                  })
-                });
-                resolve(gradedPools)
+                }
 
-              })
-            }
-            
-          })
+            })
         }
 
         function setGames() {
@@ -390,18 +390,20 @@
 
             let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
             if (document.getElementById('graded').checked) {
+              if (courtsAvailable / 4 < 4) courtsAvailable -= 1
                 setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
-                  let courtDivision = resp.length
-                  let currentCourt = 1
-                  for (let court of resp) {
-                      if (court.length < 4) continue
-                      console.log(court.map(player => player[0]))
-                      setGamesStandard(court.sort(comparePlayCounts).slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
-                      currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
-                  }
+                    let courtDivision = resp.length
+                    let currentCourt = 1
+                    for (let court of resp) {
+                        if (court.length < 4) continue
+                          //return here
+                        console.log(court.sort(comparePlayCounts).map(player => `${player[0]}-${player[1]}-${player[2]}`))
+                        setGamesStandard(court.sort(comparePlayCounts).slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
+                        currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
+                    }
                 })
             } else {
-                setGamesStandard(availablePlayers, courtsAvailable)
+                setGamesStandardNotGraded(availablePlayers, courtsAvailable)
             }
             let u = [...Array(parseInt(courtsAvailable))].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "block")
         }
@@ -446,72 +448,134 @@
             return [...new Set(finalSet)]
         }
 
-        function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, graded=false, performShuffle = true, maxCount = null) {
-            
+        function setGamesStandardNotGraded(availablePlayers, courtsAvailable, matchStartCount = 1, performShuffle = true, maxCount = null) {
             var MAX = 3;
             var rand = Math.floor((Math.random() * MAX) + 1);
-            
-            if (rand == 2 && !graded) {
-                console.log("resetting players")
-                resetPlayers();
-            } else {
-                const availablePlayersNames = availablePlayers.map(player => player[0])
+            console.log(rand)
 
-                let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
-                if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
-                if (maxCount) maxPlayers = maxCount
-                availablePlayers = availablePlayers.sort(comparePlayCounts)
-                let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
-                if (playersForGames.length < maxPlayers) {
-                    playersForGames = playersForGames.concat(
-                        getNext(availablePlayers.filter(player => !playersForGames.includes(player[0])))
-                        .slice(0, maxPlayers - playersForGames.length)
-                        .map(player => player[0]))
+            const availablePlayersNames = availablePlayers.map(player => player[0])
+
+            let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
+            if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
+            if (maxCount) maxPlayers = maxCount
+            availablePlayers = availablePlayers.sort(comparePlayCounts)
+            let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
+            if (playersForGames.length < maxPlayers) {
+                playersForGames = playersForGames.concat(
+                    getNext(availablePlayers.filter(player => !playersForGames.includes(player[0])))
+                    .slice(0, maxPlayers - playersForGames.length)
+                    .map(player => player[0]))
+            }
+
+            courts = [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ]
+            playersForGames = playersForGames.slice(0, maxPlayers);
+            if (performShuffle) {
+                playersForGames = shuffle(playersForGames);
+                playersForGames = getPlayersLeastPlayed(players.filter(player => playersForGames.includes(player[0])), playersForGames)
+            }
+            current_court = 0;
+
+            playersForGames.map((player, index) => {
+                if (index != 0 && index % 4 === 0) {
+                    current_court += 1
                 }
-
-                courts = [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ]
-                playersForGames = playersForGames.slice(0, maxPlayers);
-                if (performShuffle) {
-                    playersForGames = shuffle(playersForGames);
-                    playersForGames = getPlayersLeastPlayed(players.filter(player => playersForGames.includes(player[0])), playersForGames)
-                }
-                current_court = 0;
-
-                playersForGames.map((player, index) => {
-                    if (index != 0 && index % 4 === 0) {
-                        current_court += 1
-                    }
-                    courts[current_court].push(player)
-                    document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
-                })
+                courts[current_court].push(player)
+                document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
+            })
 
 
-                players = players.map(player => {
-                    if (availablePlayersNames.includes(player[0])) {
-                        player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
-                        player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
-                        for (let court of courts) {
-                            if (court.includes(player[0])) {
-                                for (let other of court) {
-                                    if (other === player[0]) continue
-                                    player[5][other] = other in player[5] ? player[5][other] + 1 : 1
-                                }
+            players = players.map(player => {
+                if (availablePlayersNames.includes(player[0])) {
+                    player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
+                    player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
+                    for (let court of courts) {
+                        if (court.includes(player[0])) {
+                            for (let other of court) {
+                                if (other === player[0]) continue
+                                player[5][other] = other in player[5] ? player[5][other] + 1 : 1
                             }
                         }
                     }
-                    return player
-                })
-                setTable()
+                }
+                return player
+            })
+            setTable()
+
+        }
+
+        function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, graded = false, performShuffle = true, maxCount = null) {
+
+            var MAX = 3;
+            var rand = Math.floor((Math.random() * MAX) + 1);
+
+
+            const availablePlayersNames = availablePlayers.map(player => player[0])
+
+            let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
+            if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
+            if (maxCount) maxPlayers = maxCount
+            availablePlayers = availablePlayers.sort(comparePlayCounts)
+          console.log(availablePlayers)
+            let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
+            if (playersForGames.length < maxPlayers) {
+                playersForGames = playersForGames.concat(
+                    getNext(availablePlayers.filter(player => !playersForGames.includes(player[0])))
+                    .slice(0, maxPlayers - playersForGames.length)
+                    .map(player => player[0]))
             }
+
+            courts = [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ]
+            playersForGames = playersForGames.slice(0, maxPlayers);
+            if (performShuffle) {
+                playersForGames = shuffle(playersForGames);
+                playersForGames = getPlayersLeastPlayed(players.filter(player => playersForGames.includes(player[0])), playersForGames)
+            }
+            current_court = 0;
+
+            playersForGames.map((player, index) => {
+                if (index != 0 && index % 4 === 0) {
+                    current_court += 1
+                }
+                courts[current_court].push(player)
+                document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
+            })
+
+
+            players = players.map(player => {
+                if (availablePlayersNames.includes(player[0])) {
+                    player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
+                    player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
+                    for (let court of courts) {
+                        if (court.includes(player[0])) {
+                            for (let other of court) {
+                                if (other === player[0]) continue
+                                player[5][other] = other in player[5] ? player[5][other] + 1 : 1
+                            }
+                        }
+                    }
+                }
+                return player
+            })
+            setTable()
+
 
         }
 
