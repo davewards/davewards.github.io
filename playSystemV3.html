@@ -348,7 +348,9 @@
                     availablePlayers = availablePlayers.sort(compareDivisionsRandomised)
                     const count = availablePlayers.length
 
-                    const perPool = Math.floor(count / courtsAvailable) > 4 ? Math.floor(count / courtsAvailable) : Math.ceil(count / courtsAvailable)
+                    const perPool = Math.floor(count / courtsAvailable) 
+                    
+                    const addOne = count % perPool > 1
                     let seenPlayers = []
                     bucketPlayers(availablePlayers).then(resp => {
 
@@ -362,7 +364,7 @@
                                 block.map((player, index) => {
 
                                     if (!gradedPools[i]) gradedPools.push([])
-                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable) {
+                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable || (gradedPools[i].length == perPool && i+2 == courtsAvailable && addOne)) {
                                         if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
                                             gradedPools[i].push(player)
                                             seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
@@ -393,7 +395,7 @@
 
             let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
             if (document.getElementById('graded').checked) {
-              
+              courtsAvailable = parseInt(courtsAvailable)
                 if (availablePlayers.length / courtsAvailable < 4) {
                     courtsAvailable -= 1
                 }
@@ -403,9 +405,9 @@
                 setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
                     let courtDivision = resp.length
                     let currentCourt = 1
+                    console.log(resp)
                     for (let court of resp) {
                         if (court.length < 4) continue
-                        //return here
                         console.log(court.sort(comparePlayCounts).map(player => `${player[0]}-${player[1]}-${player[2]}`))
                         setGamesStandard(court.sort(comparePlayCounts).slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
                         currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
@@ -533,7 +535,7 @@
             if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
             if (maxCount) maxPlayers = maxCount
             availablePlayers = availablePlayers.sort(comparePlayCounts)
-            console.log(availablePlayers)
+            // console.log(availablePlayers)
             let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
             if (playersForGames.length < maxPlayers) {
                 playersForGames = playersForGames.concat(
