@@ -189,9 +189,9 @@
                 </div>
             </div>
             <div class="row">
-                <button id="newGame" onclick="setGames()" style="background-color: #7ba1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4">Next Game</button>
-                <button id="newGame" onclick="clearPlayers()" style="background-color: #7bc1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Clear Players</button>
-                <button id="newGame" onclick="resetPlayers()" style="background-color: #61ad71;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Reset Players</button>
+                <button id="newGame" onclick="setGames()" style="background-color: #7ba1ea;" class=" col-sm-12 col-md-6 mt-6 mb-6">Next Game</button>
+                <!-- <button id="newGame" onclick="clearPlayers()" style="background-color: #7bc1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Clear Players</button> -->
+                <button id="newGame" onclick="resetPlayers()" style="background-color: #61ad71;" class=" col-sm-12 col-md-6 mt-6 mb-6 float-right">Reset Players</button>
             </div>
             <div class="row align-items-start">
                 <div class="col-sm-12 col-md-4 pl-4 float-left">
@@ -337,7 +337,8 @@
 
         function setGradedPools(availablePlayers, courtsAvailable) {
             return new Promise((resolve, reject) => {
-                if (gradedGamesCount < 2 && gradedPools.length === courtsAvailable && !playersChanged) {
+                //if (gradedGamesCount < 2 && gradedPools.length === courtsAvailable && !playersChanged) {
+                if (false) {
                     gradedGamesCount += 1
                     resolve(gradedPools)
                 } else {
@@ -351,6 +352,7 @@
                     const perPool = Math.floor(count / courtsAvailable) 
                     
                     const addOne = count % perPool > 1
+                    const addTwo = count % perPool > 2
                     let seenPlayers = []
                     bucketPlayers(availablePlayers).then(resp => {
 
@@ -364,7 +366,7 @@
                                 block.map((player, index) => {
 
                                     if (!gradedPools[i]) gradedPools.push([])
-                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable || (gradedPools[i].length == perPool && i+2 == courtsAvailable && addOne)) {
+                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable || (gradedPools[i].length == perPool && i+2 == courtsAvailable && addOne)  || (gradedPools[i].length == perPool && i+3 == courtsAvailable && addTwo)) {
                                         if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
                                             gradedPools[i].push(player)
                                             seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
@@ -713,7 +715,7 @@
             let playerRowsAttending = ''
             players.sort((a, b) => a[0].localeCompare(b[0])).map((player, index) => {
                 if (player[4]) {
-                    playerRowsAttending += `<tr><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Set Not Attending</span></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td>${player[1]}</td><td>${player[3]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
+                    playerRowsAttending += `<tr><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Set Not Attending</span></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
                 } else {
                     playerRows += `<tr><td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Set Attending</span></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
                 }
@@ -736,6 +738,16 @@
 
         function incrementPlayCount(index) {
             players[index][2] = players[index][2] + 1
+            setTable()
+        }
+
+        function decrementGrade(index) {
+            players[index][1] = players[index][1] > 0 ? players[index][1] - 1 : 0
+            setTable()
+        }
+
+        function incrementGrade(index) {
+            players[index][1] = players[index][1] + 1
             setTable()
         }
 
