@@ -8,6 +8,7 @@
     <title>Badminton Play Schedule</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     <style>
         .container {
         margin: 50px auto;
@@ -125,119 +126,38 @@
 </a>
     </div>
     <div class="container row">
-    <div class="row align-items-start">
-      <div class="col-sm-12 col-md-4 pl-4">
-        <h2>Tournament Organiser</h2>
-      </div>
-      <div class="col-sm-12 col-md-4 pl-4">
-        <button type="button" class="btn btn-primary form-control" onclick="openViewer()">Open Tournament Viewer</button>
-      </div>
-    </div>
-    <div class="row align-items-start">
-        <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
-        <div class="col-sm-12 col-md-4 pl-4">
-            <input type="string" class="form-control" id="tournamentName" name="tournamentName" placeholder="Type Tournament Name">
-        </div>
-        <div class="col-sm-12 col-md-4 pl-4 float-left">
-            <button type="button" class="btn btn-primary form-control" onclick="loadLastState()">Reload Last State</button>
-        </div>
-    </div>
-    <div class="row align-items-start">
-        <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
-        <div class="col-sm-12 col-md-4 pl-4">
-            <input type="string" class="form-control" id="newDivision" name="newDivision" placeholder="Type Division number">
-        </div>
-        <div class="col-sm-12 col-md-4 pl-4 float-left">
-            <button type="button" class="btn btn-primary form-control" onclick="addDivision()">Add Division</button>
-        </div>
-        <div class="col-sm-12 col-md-4 pl-4 float-left">
-        </div>
-    </div>
+    <h2>Tournament Display</h2>
+    <div class="row"><div class="col-4"><div id="qrcode"></div></div></div>
     <div class="row align-items-start ml-4">
         <div class="col-12">
             <div class="row align-items-start" id="divisionBlock" style="min-height: 150px;">
             </div>
         </div>
     </div>
-    <div id="myModal" class="modal">
 
-      <!-- Modal content -->
-      <div class="modal-content">
-        <p>Input the scores for the match below</p>
-
-        <div class="row align-items-start">
-          <div class="col-sm-12 col-md-6 pl-4">
-            <div id="teamOneModal"></div>
-          </div>
-          <div class="col-sm-12 col-md-6 pl-4">
-            <div id="teamTwoModal"></div>
-          </div>
-        </div>
-        <div class="row align-items-start">
-          <div class="col-sm-12 col-md-6 pl-4">
-              <input type="integer" class="form-control" id="teamOneSets" name="teamOneSets" placeholder="Type Team One Sets...">
-          </div>
-          <div class="col-sm-12 col-md-6 pl-4">
-              <input type="integer" class="form-control" id="teamTwoSets" name="teamTwoSets" placeholder="Type Team Two Sets...">
-          </div>
-        </div>
-        <div class="row align-items-start">
-          <div class="col-sm-12 col-md-6 pl-4">
-              <input type="integer" class="form-control" id="teamOnePoints" name="teamOnePoints" placeholder="Type Team One Points...">
-          </div>
-          <div class="col-sm-12 col-md-6 pl-4">
-              <input type="integer" class="form-control" id="teamTwoPoints" name="teamTwoPoints" placeholder="Type Team Two Points...">
-          </div>
-        </div>
-        <div class="row">
-                <h4 id="scoresModalWarning" style="text-align: left; padding-top: 5px; color: red;"></h4>
-            </div>
-        <div class="row big-margin">
-          <div class="col-sm-4 col-md-4 pl-4">
-            <button type="button" class="btn btn-secondary form-control" onclick="closeModal()">Cancel</button>
-          </div>
-          <div class="col-sm-4 col-md-4 pl-4">
-          </div>
-          <div class="col-sm-4 col-md-4 pl-4 pull-right">
-            <button type="button" class="btn btn-primary form-control" onclick="applyScore()">Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="myModal" class="modal"></div>
+    
     </div>
     <script>
-    function generateUUID() { // Public Domain/MIT
-      var d = new Date().getTime();//Timestamp
-      var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16;//random number between 0 and 16
-          if(d > 0){//Use timestamp until depleted
-              r = (d + r)%16 | 0;
-              d = Math.floor(d/16);
-          } else {//Use microseconds since page-load if supported
-              r = (d2 + r)%16 | 0;
-              d2 = Math.floor(d2/16);
-          }
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-      });
-    }
-    const dataUUID = generateUUID()
-    document.getElementById('tournamentName').value = dataUUID;
-    
+        var modal = document.getElementById("myModal");
+    new QRCode(document.getElementById("qrcode"), window.location.href);
     let divisions = []
-    var modal = document.getElementById("myModal");
     let currentResultDetails = {divisionIndex: null, resultIndex: null, isUpdate: false, isSemi: false, isFinal:false}
+
+    setInterval(function(){
+        loadLastState()
+    }, 30000)
 
     function loadLastState() {
       const urlParams = new URLSearchParams(window.location.search);
-      const bucketId = document.getElementById('tournamentName').value;
-      window.localStorage.setItem('dataUUID', bucketId)
+      const bucketId = urlParams.get('bucketId');
       fetch("https://getpantry.cloud/apiv1/pantry/a188662b-5abc-4a13-8da0-30f0a8b05aab/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
         resp.json().then(data => {
             divisions = data.divisions
             setDivisions()
         })
       })
+
     }
 
 
@@ -363,7 +283,7 @@
     function setGamesTable(results, divisionIndex){
       return `
         <table class="table table-striped table-dark">
-          <thead><th>Team 1</th><th>Team 2</th><th>Sets</th><th>Points</th><th></th></thead>
+          <thead><th>Team 1</th><th>Team 2</th><th>Sets</th><th>Points</th></thead>
           <tbody>
             ${results.map((result, resultIndex) => {
               let btn = ''
@@ -378,7 +298,7 @@
                   <td>${result.teamTwo.p1}<br/>${result.teamTwo.p2}</td>
                   <td>Team One: ${result.sets.teamOne} <br/>Team Two: ${result.sets.teamTwo}</td>
                   <td>Team One: ${result.points.teamOne} <br/>Team Two: ${result.points.teamTwo}</td>
-                  <td>${btn}</td>
+                  
                 </tr>`
               )
             }).join('')}
@@ -411,7 +331,7 @@
       }
       return {"hasSemis": hasSemis, "semis": semis, "finals": finals, "finalMatches": `
         <table class="table table-striped table-dark">
-          <thead><th>Team 1</th><th>Team 2</th><th>Sets</th><th>Points</th><th></th></thead>
+          <thead><th>Team 1</th><th>Team 2</th><th>Sets</th><th>Points</th></thead>
           <tbody>
             ${semis.map((result, resultIndex) => {
               let btn = ''
@@ -426,12 +346,12 @@
                   <td>${result.teamTwo.p1}<br/>${result.teamTwo.p2}</td>
                   <td>Team One: ${result.sets.teamOne} <br/>Team Two: ${result.sets.teamTwo}</td>
                   <td>Team One: ${result.points.teamOne} <br/>Team Two: ${result.points.teamTwo}</td>
-                  <td>${btn}</td>
+                  
                 </tr>`
               )
             }).join('')}
             <tr>
-              <td colspan="5">FINALS</td>
+              <td colspan="4">FINALS</td>
             </tr>
             ${finals.map((result, resultIndex) => {
               let btn = ''
@@ -446,7 +366,6 @@
                   <td>${result.teamTwo.p1}<br/>${result.teamTwo.p2}</td>
                   <td>Team One: ${result.sets.teamOne} <br/>Team Two: ${result.sets.teamTwo}</td>
                   <td>Team One: ${result.points.teamOne} <br/>Team Two: ${result.points.teamTwo}</td>
-                  <td>${btn}</td>
                 </tr>`
               )
             }).join('')}
@@ -460,7 +379,7 @@
             const teams = division.teams?.sort(function(a, b) { return b.setsWon - a.setsWon || b.pointsDifference - a.pointsDifference }).map((team, teamIndex) => {
               let removeButton = ''
               if (!division.started){
-                removeButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="removeTeam(${index}, ${teamIndex})">X</button>`
+                removeButton = ``
               }
               return `
                 <tr>
@@ -470,23 +389,13 @@
                   <td>${team.setsLost}</td>
                   <td>${team.pointsDifference}</td>
                   <td>${team.gamesPlayed}</td>
-                  <td>${removeButton}</td>
                 </tr>`
             })
             let newTeamBlock = ''
             let matchesBlock = ''
             let finalRounds = ''
             if (!division.started) {
-                newTeamBlock = `
-                  <div class="col-4">
-                    <input type="string" class="form-control" style="margin-bottom: 5px" id="playerOne${index}" name="playerOne" placeholder="Type Player One Name">
-                  </div>
-                  <div class="col-4">
-                    <input type="string" class="form-control" style="margin-bottom: 5px" id="playerTwo${index}" name="playerTwo" placeholder="Type Player Two Name">
-                  </div>
-                  <div class="col-4">
-                    <button type="button" class="form-control btn btn-success pull-right" style="margin-bottom: 5px" onclick="addTeam(${index})">Add team</button>
-                  </div>`
+                newTeamBlock = ``
             } else {
                 const divisionResultResponse = setDivisionTable(division.teams, division.results, index, division.hasSemis, division.semiFinals, division.finals)
                 matchesBlock = divisionResultResponse.table;
@@ -499,10 +408,10 @@
             const disabled = division.teams?.length <= 2 || division.results?.length > 0;
             let mainButton = ''
             if (!disabled) {
-              mainButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="startDivision(${index})">Start</button>`
+              mainButton = ``
             }
             if (division.results?.length > 0 && division.results.filter(res =>  res.completed).length === division.results.length) {
-              mainButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="setFinals(${index})">Set Finals</button>`
+              mainButton = ``
             }
             return `
               <div class="col-sm-12 card" style="margin-top: 30px; margin-left:20px; padding-bottom: 30px">
@@ -522,7 +431,7 @@
                   <div class="col-sm-12 col-md-4">
                   <h4>Table</h4>
                     <table class="table table-striped table-dark">
-                      <thead><th>Player One</th><th>Player Two</th><th>Sets +</th><th>Sets -</th><th>Points Diff</th><th>Games Played</th><th></th></thead>
+                      <thead><th>Player One</th><th>Player Two</th><th>Sets +</th><th>Sets -</th><th>Points Diff</th><th>Games Played</th></thead>
                       <tbody>${teams.join('')}</tbody>
                     </table>
                   </div>
@@ -541,24 +450,7 @@
                 </div>
               </div>`
         })
-        let divisionsList = JSON.parse(window.localStorage.getItem('divisions')) || []
-        divisionsList.push(divisions)
-        window.localStorage.setItem('divisions', JSON.stringify(divisionsList))
         document.getElementById("divisionBlock").innerHTML = divisionBlocks.join('');
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        var raw = JSON.stringify({"divisions": divisions});
-        const bucketId = document.getElementById('tournamentName').value;
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'
-        };
-        fetch("https://getpantry.cloud/apiv1/pantry/a188662b-5abc-4a13-8da0-30f0a8b05aab/basket/" + bucketId, requestOptions
-        ).then()
     }
 
     function addDivision() {
@@ -738,12 +630,8 @@
       }
     }
 
-
-    function openViewer(){
-      const bucketId = document.getElementById('tournamentName').value;
-      var win = window.open('/tournamentSystemDisplay.html?bucketId=' + bucketId, '_blank');
-      win.focus();
-    }
+    
+    loadLastState()
     </script>
 </body>
 
