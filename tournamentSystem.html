@@ -266,16 +266,16 @@
 
     function setFiveTeamTournament(teams, divisionIndex) {
         let results = [
-          {teamOne: teams[4], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
-          {teamOne: teams[3], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
-          {teamOne: teams[4], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
-          {teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOne: teams[4], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
-          {teamOne: teams[0], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
-          {teamOne: teams[1], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[3], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[4], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[1], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOne: teams[3], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[2], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOne: teams[1], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
         ]
         return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
     }
