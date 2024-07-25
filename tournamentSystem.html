@@ -132,6 +132,9 @@
       <div class="col-sm-12 col-md-4 pl-4">
         <button type="button" class="btn btn-primary form-control" onclick="openViewer()">Open Tournament Viewer</button>
       </div>
+      <div class="col-sm-12 col-md-4 pl-4">
+        <button type="button" class="btn btn-primary form-control" onclick="openCheckIn()">Open Tournament CheckIn</button>
+      </div>
     </div>
     <div class="row align-items-start">
         <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
@@ -778,6 +781,11 @@
     function openViewer(){
       const bucketId = document.getElementById('tournamentName').value;
       var win = window.open('/tournamentSystemDisplay.html?bucketId=' + bucketId, '_blank');
+      win.focus();
+    }
+
+    function openCheckIn() {
+      var win = window.open('/tournamentCheckIn.html?bucketId=' + bucketId, '_blank');
       win.focus();
     }
     </script>
