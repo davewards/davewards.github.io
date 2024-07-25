@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Check-In</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <style>
+        #myInput {
+            background-image: url('/css/searchicon.png'); /* Add a search icon to input */
+            background-position: 10px 12px; /* Position the search icon */
+            background-repeat: no-repeat; /* Do not repeat the icon image */
+            width: 100%; /* Full-width */
+            font-size: 16px; /* Increase font-size */
+            padding: 12px 20px 12px 40px; /* Add some padding */
+            border: 1px solid #ddd; /* Add a grey border */
+            margin-bottom: 12px; /* Add some space below the input */
+          }
+        #excelTable {
+            background-image: url('/css/searchicon.png'); /* Add a search icon to input */
+            background-position: 10px 12px; /* Position the search icon */
+            background-repeat: no-repeat; /* Do not repeat the icon image */
+            width: 100%; /* Full-width */
+            font-size: 16px; /* Increase font-size */
+            padding: 12px 20px 12px 40px; /* Add some padding */
+            border: 1px solid #ddd; /* Add a grey border */
+            margin-bottom: 12px; /* Add some space below the input */
+          }
+          
+          #excelTable {
+            border-collapse: collapse; /* Collapse borders */
+            width: 100%; /* Full-width */
+            border: 1px solid #ddd; /* Add a grey border */
+            font-size: 18px; /* Increase font-size */
+          }
+          
+          #excelTable th, #excelTable td {
+            text-align: left; /* Left-align text */
+            padding: 12px; /* Add padding */
+            width: 12%;
+          }
+          
+          #excelTable tr {
+            /* Add a bottom border to all table rows */
+            border-bottom: 1px solid #ddd;
+          }
+          
+          #excelTable tr.header, #excelTable tr:hover {
+            /* Add a grey background color to the table header and on hover */
+            background-color: #f1f1f1;
+          }
+    </style>
+</head>
+<body>
+    <h1>The Park Badminton Club Summer Tournament 2024</h1>
+    
+    <br><br>
+    
+    
+
+    <div class="container row">
+        <div class="row align-items-start">
+            <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
+
+            <div class="col-sm-12 col-md-4 pl-4">
+                Select Player Entries File:
+            </div>
+            <div class="col-sm-12 col-md-4 pl-4">
+                <input type="file"  id="fileInput" accept=".xlsx, .xls">
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
+
+            <div class="col-sm-12 col-md-4 pl-4">
+                Provide Tournament Name
+            </div>
+            <div class="col-sm-12 col-md-4 pl-4">
+                <input type="text" class="form-control" id="tournamentName" placeholder="Tournament Name" required>
+            </div>
+        </div>
+    </div>  
+    <div class="container row">
+        <div class="row align-items-start">
+            <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
+            <div class="col-sm-12 col-md-4 pl-4">
+                <input type="text" id="myInput" onkeyup="filterRows()" placeholder="Filter by names..">
+            </div>
+            <div class="col-sm-12 col-md-4 pl-4">
+                <button type="button" class="btn btn-primary form-control" onclick="resetTournament()">Reset Tournament</button>
+              </div>
+        </div>
+    </div>
+
+    
+    <table id="excelTable">
+        <thead>
+            <th>Player 1 Name</th>
+            <th>Player 2 Name</th>
+            <th>Division</th>
+            <th>Player 1 BI Number</th>
+            <th>Player 2 BI Number</th>
+            <th>Email Address</th>
+            <th>Phone Number</th>
+            <th>Checked In?</th>
+        </thead>
+        <tbody id="tableRows">
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', handleFile, false);
+        let XL_row_object;
+        let divisionsIndexes = [];
+        let divisions = [];
+        window.onload = function() {
+
+            var playerEntries = window.localStorage.getItem('playerEntries');
+            if (playerEntries !== null){
+                XL_row_object = JSON.parse(playerEntries);
+                console.log(XL_row_object);
+                setTable();
+                divisions = JSON.parse(window.localStorage.getItem('divisions'));
+                divisionsIndexes = JSON.parse(window.localStorage.getItem('divisionsIndexes'));
+                saveInTournament();
+            }
+        
+        }
+
+        function resetTournament() {
+            if(confirm(`Are you sure you want to reset the tournament?`)) {
+                window.localStorage.clear();
+                /*XL_row_object = [];
+                document.getElementById("tableRows").innerHTML = null;
+                divisionsIndexes = [];
+                divisions = [];*/
+                window.location.reload();
+            }
+        }
+
+        function generateUUID() { // Public Domain/MIT
+            var d = new Date().getTime();//Timestamp
+            var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16;//random number between 0 and 16
+                if(d > 0){//Use timestamp until depleted
+                    r = (d + r)%16 | 0;
+                    d = Math.floor(d/16);
+                } else {//Use microseconds since page-load if supported
+                    r = (d2 + r)%16 | 0;
+                    d2 = Math.floor(d2/16);
+                }
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+          }
+        
+        function handleFile(e) {
+            window.localStorage.setItem('playerEntries', []);
+            window.localStorage.setItem('divisions', []);
+            window.localStorage.setItem('divisionsIndexes', []);
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                XL_row_object = XLSX.utils.sheet_to_row_object_array(worksheet);
+                XL_row_object.forEach((item) => {
+                    item.isAttending = false;
+                    item.P1Name = item["Player 1 First Name"] +' ' + item["Player 1 Surname"];
+                    item.P2Name = item["Player 2 First Name"] +' ' + item["Player 2 Surname"];
+                    item.id = generateUUID();
+                });
+                setTable();
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function setTable() {
+                let  tableRow = '';
+                let index = 0;
+                XL_row_object.forEach((item) => {
+                    tableRow += `<tr>`;
+                        tableRow += `<td><span>${item.P1Name}</span></td>`;  
+                        tableRow += `<td><span>${item.P2Name}</span></td>`; 
+                        tableRow += `<td><span>${item["Division"]}</span></td>`; 
+                        tableRow += `<td><span>${item["Player 1 BI number"]}</span></td>`; 
+                        tableRow += `<td><span>${item["Player 2 BI number"]}</span></td>`; 
+                        tableRow += `<td><span>${item["Contact email"]}</span></td>`; 
+                        tableRow += `<td><span>${item["Contact mobile number"]}</span></td>`;
+                        if(item.isAttending)
+                            tableRow += `<td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Attending</span></td>`;
+                        else
+                        tableRow += `<td><span class="hover" style="border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey;" onclick="toggleAttending(${index})">Not Attending</span></td>`;
+                    tableRow +=`</tr>`;  
+                    index +=1;              
+                });
+                document.getElementById("tableRows").innerHTML = tableRow;
+        }
+
+        function toggleAttending(index) {
+            if(document.getElementById('tournamentName').value === ''){
+                alert('Please Provide Tournament Name to proceed');
+                return;
+            }
+            let confirmationChoice;
+            if(XL_row_object[index].isAttending)
+                confirmationChoice = confirm(`${XL_row_object[index].P1Name} and ${XL_row_object[index].P2Name} have not checked in yet?`);
+            else
+                confirmationChoice = confirm(`${XL_row_object[index].P1Name} and ${XL_row_object[index].P2Name} have checked in now?`);
+            
+            if(confirmationChoice) {
+                XL_row_object[index].isAttending = !XL_row_object[index].isAttending;
+                if(XL_row_object[index].isAttending)
+                    addTournamentEntry(index);
+                else
+                    removeTournamentEntry(index);
+                setTable();
+                window.localStorage.setItem('playerEntries', JSON.stringify(XL_row_object));
+                window.localStorage.setItem('divisions', JSON.stringify(divisions));
+                window.localStorage.setItem('divisionsIndexes', JSON.stringify(divisionsIndexes));
+            }
+        }
+        function addTournamentEntry(playerIndex) {
+            if(divisionsIndexes.indexOf(XL_row_object[playerIndex].Division) == -1) {
+                divisionsIndexes.push(XL_row_object[playerIndex].Division);
+                divisions.push({ "name": XL_row_object[playerIndex].Division, "teams": [], "results": [], "semiFinals": [], "finals": [], "started": false, "finalsStarted": false, "hasSemis": false })
+            }
+            const divisionIndex = divisionsIndexes.indexOf(XL_row_object[playerIndex].Division);
+            const team = { "p1": XL_row_object[playerIndex].P1Name, "p2": XL_row_object[playerIndex].P2Name, "setsWon": 0, "setsLost": 0, "pointsDifference": 0, "gamesPlayed": 0, "id": XL_row_object[playerIndex].id };
+            divisions[divisionIndex].teams.push(team);
+            console.log(divisions);
+            saveInTournament();
+
+        }
+
+        function removeTournamentEntry(playerIndex) {
+            const divisionIndex = divisionsIndexes.indexOf(XL_row_object[playerIndex].Division);
+            const teamsInDiv = divisions[divisionIndex].teams;
+            let updatedTeams = [];
+            teamsInDiv.forEach((team) => {
+                if(team.p1+team.p2 != XL_row_object[playerIndex].P1Name+XL_row_object[playerIndex].P2Name) {
+                    updatedTeams.push(team);
+                }
+            });
+            divisions[divisionIndex].teams = updatedTeams;
+            saveInTournament();
+        }
+
+        function saveInTournament() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({"divisions": divisions});
+            const bucketId = document.getElementById('tournamentName').value;
+            if(bucketId.length >0) {
+                var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+                };
+                fetch("https://getpantry.cloud/apiv1/pantry/a188662b-5abc-4a13-8da0-30f0a8b05aab/basket/" + bucketId, requestOptions
+                ).then();
+            }
+            else {
+                confirm(`Please Provide Tournament Name`);
+            }
+        }
+
+        function filterRows() {
+            // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("excelTable");
+            tr = table.getElementsByTagName("tr");
+          
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          }
+    </script>
+</body>
+</html>
