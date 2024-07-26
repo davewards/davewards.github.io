@@ -429,7 +429,7 @@
     function setFinalGamesTable(results, teams, divisionIndex, hasSemis, semis, finals){
       if (results.filter(res =>  !res.completed).length) return {"hasSemis": hasSemis, "semis": semis, "finals": finals, "finalMatches": ''}
       if (hasSemis && semis.length === 0) {
-        const semiTeams = [...teams].sort(function(a, b) { return b.setsWon - a.setsWon || b.pointsDifference - a.pointsDifference }).slice(0, 4)
+        const semiTeams = [...teams].sort(function(a, b) { return  b.setsWon - a.setsWon || (b.setsWon - b.setsLost) - (a.setsWon - a.setsLost) || b.pointsDifference - a.pointsDifference }).slice(0, 4)
         semis = [
           {teamOne: semiTeams[0], teamTwo: semiTeams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOne: semiTeams[1], teamTwo: semiTeams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
@@ -442,7 +442,7 @@
           finalistOne = semis[0].sets.teamOne > semis[0].sets.teamTwo || (semis[0].sets.teamOne === semis[0].sets.teamTwo && semis[0].points.teamOne > semis[0].points.teamTwo)? semis[0].teamOne : semis[0].teamTwo
           finalistTwo = semis[1].sets.teamOne > semis[1].sets.teamTwo || (semis[1].sets.teamOne === semis[1].sets.teamTwo && semis[1].points.teamOne > semis[1].points.teamTwo)? semis[1].teamOne : semis[1].teamTwo
         } else {
-          const finalists = [...teams].sort(function(a, b) { return b.setsWon - a.setsWon || b.pointsDifference - a.pointsDifference }).slice(0, 2)
+          const finalists = [...teams].sort(function(a, b) { return b.setsWon - a.setsWon || (b.setsWon - b.setsLost) - (a.setsWon - a.setsLost) || b.pointsDifference - a.pointsDifference }).slice(0, 2)
           finalistOne = finalists[0]
           finalistTwo = finalists[1]
         }
@@ -496,7 +496,7 @@
 
     function setDivisions() {
         const divisionBlocks = divisions.map((division, index) => {
-            const teams = division.teams?.sort(function(a, b) { return b.setsWon - a.setsWon || b.pointsDifference - a.pointsDifference }).map((team, teamIndex) => {
+            const teams = division.teams?.sort(function(a, b) { return b.setsWon - a.setsWon || (b.setsWon - b.setsLost) - (a.setsWon - a.setsLost) || b.pointsDifference - a.pointsDifference }).map((team, teamIndex) => {
               let removeButton = ''
               if (!division.started){
                 removeButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="removeTeam(${index}, ${teamIndex})">X</button>`
