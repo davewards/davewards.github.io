@@ -410,8 +410,22 @@
                     console.log(resp)
                     for (let court of resp) {
                         if (court.length < 4) continue
-                        console.log(court.sort(comparePlayCounts).map(player => `${player[0]}-${player[1]}-${player[2]}`))
-                        setGamesStandard(court.sort(comparePlayCounts).slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
+                        let playersThisBlock = court.sort(comparePlayCounts).filter(player => player[3] === 'Waiting').map(player => player);
+                        let seenPlayers = playersThisBlock.map(player => player[0])
+                        court.sort(comparePlayCounts).map(player => {
+                          if (!seenPlayers.includes(player[0])) {
+                            playersThisBlock.push(player);
+                            seenPlayers.push(player[0])
+                          }
+                        })
+                        console.log(playersThisBlock.map(player => `${player[0]}-${player[1]}-${player[2]}-${player[3]}`))
+                        players = players.map(player => {
+                            if (seenPlayers.includes(player[0]) && !seenPlayers.slice(0, 4).includes(player[0])) {
+                                player[3] = 'Waiting'
+                            }
+                            return player
+                        })
+                        setGamesStandard(playersThisBlock.slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
                         currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
                     }
                 })
@@ -576,6 +590,7 @@
                 if (availablePlayersNames.includes(player[0])) {
                     player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
                     player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
+                  
                     for (let court of courts) {
                         if (court.includes(player[0])) {
                             for (let other of court) {
