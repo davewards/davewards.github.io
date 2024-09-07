@@ -831,12 +831,17 @@
             });
 
             const utterThis = new SpeechSynthesisUtterance(ourText)
-            utterThis.volume = 0.9;
+            
             synth.speak(utterThis)
 
         }
 
         function startTimer() {
+            const synth = window.speechSynthesis
+            let ourText = "Timer Starting!!!"
+            const utterThis = new SpeechSynthesisUtterance(ourText)
+            
+            synth.speak(utterThis)
             let duration = document.getElementById('minutesPerGame').value || 10
             const display = document.getElementById('time')
             document.getElementById('showTimer').style.display = 'block';
@@ -860,7 +865,7 @@
                   const synth = window.speechSynthesis
                   let ourText = "Last Serve!!!"
                   const utterThis = new SpeechSynthesisUtterance(ourText)
-                  utterThis.volume = 0.9;
+                  
                   synth.speak(utterThis)
                   clearInterval(timeInterval)
                   document.getElementById('showTimer').style.display = 'none';
