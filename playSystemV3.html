@@ -89,6 +89,12 @@
 " style="max-width: 230px; max-height: 200px;"></a>
         </div>
         <div class="container row">
+            <div class="col-sm-12" style="display: none;" id="showTimer">
+                <h3>Time Remaining</h3>
+                <h3 id="time"></h3>
+            </div>
+        </div>
+        <div class="container row">
             <h2>Court Scheduler V2</h2>
             <div class="row align-items-start" style="min-height: 150px;">
                 <div style="border: 1px solid lightgrey; min-height: 130px;" class="col-sm-12 col-md-3" id="court1">
@@ -191,12 +197,14 @@
             <div class="row">
                 <button id="newGame" onclick="setGames()" style="background-color: #7ba1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4">Next Game</button>
                 <button id="announceGame" onclick="announcePlayers()" style="background-color: #7bc1ea;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Announce Players</button>
-                <button id="newResetGame" onclick="resetPlayers()" style="background-color: #61ad71;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Reset Players</button>
+                <button id="startTimer" onclick="startTimer()" style="background-color: #61ad71;" class=" col-sm-12 col-md-4 mt-4 mb-4 float-right">Start Timer</button>
             </div>
             <div class="row align-items-start">
                 <div class="col-sm-12 col-md-4 pl-4 float-left">
                     <label>How many courts do you have? (max 8)</label>
                     <input type="number" class="form-control" id="courtsAvailable" name="" min="1" max="8" value="4" placeholder="How many courts have you got?">
+                    <label>How many minutes per game</label>
+                    <input type="number" class="form-control" id="minutesPerGame" name="" min="1" max="25" value="4" placeholder="How many minutes per game?">
                 </div>
                 <div class="col-sm-12 col-md-4 pl-4 float-left text-left">
                     <label>Upload player file (data is local only)</label>
@@ -349,8 +357,8 @@
                     availablePlayers = availablePlayers.sort(compareDivisionsRandomised)
                     const count = availablePlayers.length
 
-                    const perPool = Math.floor(count / courtsAvailable) 
-                    
+                    const perPool = Math.floor(count / courtsAvailable)
+
                     const addOne = count % perPool > 1
                     const addTwo = count % perPool > 2
                     let seenPlayers = []
@@ -366,7 +374,7 @@
                                 block.map((player, index) => {
 
                                     if (!gradedPools[i]) gradedPools.push([])
-                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable || (gradedPools[i].length == perPool && i+2 == courtsAvailable && addOne)  || (gradedPools[i].length == perPool && i+3 == courtsAvailable && addTwo)) {
+                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable || (gradedPools[i].length == perPool && i + 2 == courtsAvailable && addOne) || (gradedPools[i].length == perPool && i + 3 == courtsAvailable && addTwo)) {
                                         if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
                                             gradedPools[i].push(player)
                                             seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
@@ -386,7 +394,7 @@
         function setGames() {
             let s = [...Array(32)].map((_, i) => document.getElementById("player" + (i + 1)).innerHTML = '')
             let availablePlayers = players.filter(player => player[4])
-            
+
             players = players.map(player => setPlayersPlayed(player, availablePlayers))
             setCaptains()
             let courtsAvailable = document.getElementById("courtsAvailable").value || 4;
@@ -397,12 +405,12 @@
 
             let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
             if (document.getElementById('graded').checked) {
-              courtsAvailable = parseInt(courtsAvailable)
+                courtsAvailable = parseInt(courtsAvailable)
                 if (availablePlayers.length / courtsAvailable < 4) {
                     courtsAvailable -= 1
                 }
                 if (availablePlayers.length / 4 < courtsAvailable) {
-                  courtsAvailable = Math.floor(availablePlayers.length / 4)
+                    courtsAvailable = Math.floor(availablePlayers.length / 4)
                 }
                 setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
                     let courtDivision = resp.length
@@ -413,10 +421,10 @@
                         let playersThisBlock = court.sort(comparePlayCounts).filter(player => player[3] === 'Waiting').map(player => player);
                         let seenPlayers = playersThisBlock.map(player => player[0])
                         court.sort(comparePlayCounts).map(player => {
-                          if (!seenPlayers.includes(player[0])) {
-                            playersThisBlock.push(player);
-                            seenPlayers.push(player[0])
-                          }
+                            if (!seenPlayers.includes(player[0])) {
+                                playersThisBlock.push(player);
+                                seenPlayers.push(player[0])
+                            }
                         })
                         console.log(playersThisBlock.map(player => `${player[0]}-${player[1]}-${player[2]}-${player[3]}`))
                         players = players.map(player => {
@@ -590,7 +598,7 @@
                 if (availablePlayersNames.includes(player[0])) {
                     player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
                     player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
-                  
+
                     for (let court of courts) {
                         if (court.includes(player[0])) {
                             for (let other of court) {
@@ -806,32 +814,58 @@
         }
 
         function announcePlayers() {
-          const synth = window.speechSynthesis
-          let ourText = "Player Announcement."
-          let courtsAvailable = document.getElementById("courtsAvailable").value || 4;
-          courtsAvailable = parseInt(courtsAvailable)
-          let arr = [...Array(courtsAvailable)].forEach((_, i) => {
-            let player_names = []
-            i += 1
-            console.log(document.getElementsByClassName('court' + i + 'Player'))
-            const collection = document.getElementsByClassName('court' + i + 'Player');
-            for (let i = 0; i < collection.length; i++) {
-              player_names.push(collection[i].textContent)
-              console.log(collection[i].textContent)
-            }
-            // document.getElementsByClassName('court' + i + 'Player').forEach(name => {
-            // })
-            console.log(player_names)
-            if (player_names.length > 0) {
-              ourText += '\n Court ' + i + ' Players \n' + player_names.join('\n ')
-            }
-          });
-          
-          console.log(ourText)
-          const utterThis = new SpeechSynthesisUtterance(ourText)
-          utterThis.volume = 0.9;
-          synth.speak(utterThis)
+            const synth = window.speechSynthesis
+            let ourText = "Player Announcement."
+            let courtsAvailable = document.getElementById("courtsAvailable").value || 4;
+            courtsAvailable = parseInt(courtsAvailable)
+            let arr = [...Array(courtsAvailable)].forEach((_, i) => {
+                let player_names = []
+                i += 1
+                const collection = document.getElementsByClassName('court' + i + 'Player');
+                for (let i = 0; i < collection.length; i++) {
+                    player_names.push(collection[i].textContent)
+                }
+                if (player_names.length > 0) {
+                    ourText += '\n Court ' + i + ' Players \n' + player_names.join('\n ')
+                }
+            });
 
+            const utterThis = new SpeechSynthesisUtterance(ourText)
+            utterThis.volume = 0.9;
+            synth.speak(utterThis)
+
+        }
+
+        function startTimer() {
+            let duration = document.getElementById('minutesPerGame').value || 10
+            const display = document.getElementById('time')
+            document.getElementById('showTimer').style.display = 'block';
+            duration = 60 * duration;
+            var timer = duration,
+                minutes, seconds;
+            const timeInterval = setInterval(function() {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+                if (timer === 0) {
+                  display.textContent = ''
+                  const synth = window.speechSynthesis
+                  let ourText = "Last Serve!!!"
+                  const utterThis = new SpeechSynthesisUtterance(ourText)
+                  utterThis.volume = 0.9;
+                  synth.speak(utterThis)
+                  clearInterval(timeInterval)
+                  document.getElementById('showTimer').style.display = 'none';
+                }
+            }, 1000);
         }
 
         const form = document.getElementById('playerInputForm');
@@ -857,11 +891,11 @@
             reader.readAsBinaryString(fileInput.files[0])
         }
 
-        if('speechSynthesis' in window){
-          console.log("Web Speech API supported!")
+        if ('speechSynthesis' in window) {
+            console.log("Web Speech API supported!")
         } else {
-          document.getElementById("announcePlayers").display = 'none';
-          console.log("Web Speech API not supported :-(")   
+            document.getElementById("announcePlayers").style.display = 'none';
+            console.log("Web Speech API not supported :-(")
         }
 
         fileInput.addEventListener('change', readFile)
