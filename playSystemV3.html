@@ -309,8 +309,55 @@
         let gradedGamesCount = 0;
         let playersChanged = false
 
-
+        
+        populateMembers()
         setTable(players)
+
+        function populateMembers() {
+            players.push(['Nitin Paliwal', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Tim O\'Flynn', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Marie O\'Flynn', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['John Hampson', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Ana Canizares bejarano', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Shweta Bhagat', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Sai', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Adrian Barbour', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Fiona Hawkshaw', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Nameeta Baviskar-Bruton', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Noel Fabro', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Danielle Mallin', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Sripriya Balasubramanium', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Haseeb Ahmed', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Adil Qureshi', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Janice Kelly', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Niamh Williams', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Arunachalam Sivaprakasam', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Anna Slevin', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Niamh Collins', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Krati Paliwal', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Priyam Bhadauria', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Ketki Keskar', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Vaishali Shetty', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Charlotte', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['John Slevin', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['David Edwards', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Paul Sleviin', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Deeksha', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Thahsin Ali', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Amit Kharb', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['John Levesley', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Martin Ryan', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Kamrul Hasan', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Charles', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Alwin', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Madhav', 7 , 0, 'Waiting', false, {}, 0])
+            players.push(['Aoife', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Dmitri', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Rama', 8 , 0, 'Waiting', false, {}, 0])
+            players.push(['Vivaksha', 6 , 0, 'Waiting', false, {}, 0])
+            players.push(['Ronan Hickey', 9 , 0, 'Waiting', false, {}, 0])
+            players.push(['Paras', 8 , 0, 'Waiting', false, {}, 0])
+        }
 
         function resetPlayers() {
             players = JSON.parse(window.localStorage.getItem('players'))
@@ -911,7 +958,7 @@
         const readFile = () => {
             const reader = new FileReader()
             reader.onload = () => {
-                playsers = []
+                players = []
                 Promise.all(reader.result.split('ï»¿').join('').split('\r').join('').split('\n').map(row => {
                     let player = row.split(',')
                     if (player.length > 1) {
