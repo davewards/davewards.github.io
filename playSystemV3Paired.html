@@ -20,6 +20,9 @@
         margin-left: 3px;
         margin-right: 3px;
       }
+      label {
+        font-weight: 600;
+      }
       .courtRow {
         width: 100%;
         border-bottom: 1px solid lightgrey;
@@ -69,6 +72,10 @@
         transition: .4s;
       }
 
+      .row {
+        min-width: 100%;
+      }
+
       input:checked + .slider {
         background-color: #2196F3;
       }
@@ -94,7 +101,7 @@
     </style>
 </head>
 
-<body style="max-width: 90vw; margin-left:8px">
+<body style="max-width: 95vw; margin-left:8px">
 
     <body>
         <div class="container text-center">
@@ -243,26 +250,24 @@
                     <input type="file" class="form-control" id="csv" name="googleSheetURL" placeholder="Load local CSV file">
                     <label style="text-align: left;">File format expected: <b>CSV</b>. <br>Two columns: Name, Division. Eg. <br>Player One,4<br>Player Two,6</label>
                 </div>
-                <div class="col-sm-12 col-md-4 pl-4 float-left" style="display: none;">
+                <div class="col-sm-12 col-md-4 pl-4 float-left">
                     <label>Player Mode</label><br />
                     <label>Random</label>
-                    <!-- <input type="checkbox" class="form-check-input" id="graded" name="graded" placeholder=""> -->
                     <label class="switch">
                         <input type="checkbox" id="graded">
                         <span class="slider"></span>
                     </label>
                     <label>Graded</label>
                 </div>
-                <div class="col-sm-12 col-md-4 pl-4 float-left">
+                <!-- <div class="col-sm-12 col-md-4 pl-4 float-left">
                     <label>Paired Mode</label><br />
                     <label>Equal Pairs</label>
-                    <!-- <input type="checkbox" class="form-check-input" id="graded" name="graded" placeholder=""> -->
                     <label class="switch">
                         <input type="checkbox" id="pairing">
                         <span class="slider"></span>
                     </label>
                     <label>Standard</label>
-                </div>
+                </div> -->
             </div>
             <hr>
             <form id="playerInputForm">
@@ -282,7 +287,7 @@
                 </div>
             </form>
             <div class="row align-items-start" style="margin-top: 30px">
-                <h3 style="width: 100%; border-bottom: 1px solid lightgrey; background-color: #c4e3c4">Present</h3>
+                <h3 style="width: 100%; border-bottom: 1px solid lightgrey; background-color: #c4e3c4"><span id="playerCount" style="margin-right: 10px"></span>Present</h3>
                 <table class="table" id="playerTable">
                     <thead>
                         <th>Attending</th>
@@ -452,7 +457,7 @@
                 setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
                     let courtDivision = resp.length
                     let currentCourt = 1
-                    console.log(resp)
+                    // console.log(resp)
                     for (let court of resp) {
                         if (court.length < 4) continue
                         let playersThisBlock = court.sort(comparePlayCounts).filter(player => player[3] === 'Waiting').map(player => player);
@@ -463,7 +468,7 @@
                                 seenPlayers.push(player[0])
                             }
                         })
-                        console.log(playersThisBlock.map(player => `${player[0]}-${player[1]}-${player[2]}-${player[3]}`))
+                        // console.log(playersThisBlock.map(player => `${player[0]}-${player[1]}-${player[2]}-${player[3]}`))
                         players = players.map(player => {
                             if (seenPlayers.includes(player[0]) && !seenPlayers.slice(0, 4).includes(player[0])) {
                                 player[3] = 'Waiting'
@@ -525,7 +530,7 @@
             let courts = []
             let courtsGrades = []
             let seenPlayers = []
-            console.log(averageGrade)
+            // console.log(averageGrade)
             let loop = [...Array(parseInt(courtsAvailable))].map((_, court) => {
                 if (courts.length < court + 1) courts.push([])
                 if (courtsGrades.length < court + 1) courtsGrades.push([])
@@ -590,11 +595,9 @@
                 playersForGames = shuffle(playersForGames);
                 playersForGames = getPlayersLeastPlayed(players.filter(player => playersForGames.includes(player[0])), playersForGames)
             }
-            if (!document.getElementById("pairing").checked) {
-              const balancedPairings = createBalancedPairings(playersForGames, courtsAvailable)
-              playersForGames = balancedPairings.playersOrdered
-              // console.log(playersForGames, balancedPairings.grades, balancedPairings.grades.map(grade => grade.reduce((a, b) => a + b)/grade.length))
-            }
+            
+            const balancedPairings = createBalancedPairings(playersForGames, courtsAvailable)
+            playersForGames = balancedPairings.playersOrdered
             
             current_court = 0;
 
@@ -605,6 +608,8 @@
                 courts[current_court].push(player)
                 document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
             })
+
+            console.log(playersForGames)
 
             players = players.map(player => {
                 if (availablePlayersNames.includes(player[0])) {
@@ -813,8 +818,10 @@
             document.getElementById("tableRowsAttending").innerHTML = ""
             let playerRows = ''
             let playerRowsAttending = ''
+            let playerCount = 0
             players.sort((a, b) => a[0].localeCompare(b[0])).map((player, index) => {
                 if (player[4]) {
+                    playerCount += 1
                     playerRowsAttending += `<tr><td><button class="hover" style="background-color: #eb6f6f; width: 100%" onclick="toggleAttending(${index})">Remove</button></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td><button style="width: 100%" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
                 } else {
                     playerRows += `<tr><td><button class="hover" style="background-color: #5db35d; width: 100%" onclick="toggleAttending(${index})">Add</button></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
@@ -823,6 +830,7 @@
 
             document.getElementById("tableRows").innerHTML = playerRows
             document.getElementById("tableRowsAttending").innerHTML = playerRowsAttending
+            document.getElementById("playerCount").innerHTML = playerCount
         }
 
         function toggleAttending(index) {
@@ -909,7 +917,7 @@
             });
 
             const utterThis = new SpeechSynthesisUtterance(ourText)
-
+            console.log(utterThis)
             synth.speak(utterThis)
 
         }

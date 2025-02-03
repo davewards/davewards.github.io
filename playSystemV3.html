@@ -272,7 +272,7 @@
                 </div>
             </form>
             <div class="row align-items-start" style="margin-top: 30px">
-                <h3 style="width: 100%; border-bottom: 1px solid lightgrey; background-color: #c4e3c4">Present</h3>
+                <h3 style="width: 100%; border-bottom: 1px solid lightgrey; background-color: #c4e3c4"><span id="playerCount" style="margin-right: 10px"></span>Present</h3>
                 <table class="table" id="playerTable">
                     <thead>
                         <th>Attending</th>
@@ -762,8 +762,10 @@
             document.getElementById("tableRowsAttending").innerHTML = ""
             let playerRows = ''
             let playerRowsAttending = ''
+            let playerCount = 0
             players.sort((a, b) => a[0].localeCompare(b[0])).map((player, index) => {
                 if (player[4]) {
+                    playerCount += 1
                     playerRowsAttending += `<tr><td><button class="hover" style="background-color: #eb6f6f; width: 100%" onclick="toggleAttending(${index})">Remove</button></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td><button style="width: 100%" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
                 } else {
                     playerRows += `<tr><td><button class="hover" style="background-color: #5db35d; width: 100%" onclick="toggleAttending(${index})">Add</button></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
@@ -772,6 +774,7 @@
 
             document.getElementById("tableRows").innerHTML = playerRows
             document.getElementById("tableRowsAttending").innerHTML = playerRowsAttending
+            document.getElementById("playerCount").innerHTML = playerCount
         }
 
         function toggleAttending(index) {
