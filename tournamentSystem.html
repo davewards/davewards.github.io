@@ -250,7 +250,7 @@
               })
               return div
             })
-            setDivisions()
+            setDivisions(false, data.registration_complete)
         })
       })
     }
@@ -310,7 +310,7 @@
           {teamOneUUID: teams[1].id, teamTwoUUID: teams[2].id, teamOne: teams[1], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOneUUID: teams[4].id, teamTwoUUID: teams[0].id, teamOne: teams[4], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
         ]
-        return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, true, [], [])} 
+        return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
     }
 
     function setSevenTeamTournament(teams, divisionIndex) {
@@ -348,7 +348,7 @@
           {teamOneUUID: teams[2].id, teamTwoUUID: teams[3].id, teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
           {teamOneUUID: teams[6].id, teamTwoUUID: teams[7].id, teamOne: teams[6], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
         ]
-        return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, true, [], [])} 
+        return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
     }
 
     function setNineTeamTournament(teams, divisionIndex) {
@@ -498,7 +498,8 @@
       `}
     }
 
-    function setDivisions() {
+    function setDivisions(upload_state=true, registration_complete_local=registration_complete) {
+      console.log(registration_complete_local)
         const divisionBlocks = divisions.map((division, index) => {
             const teams = division.teams?.sort(function(a, b) { return b.setsWon - a.setsWon || (b.setsWon - b.setsLost) - (a.setsWon - a.setsLost) || b.pointsDifference - a.pointsDifference }).map((team, teamIndex) => {
               let removeButton = ''
@@ -541,8 +542,8 @@
             }
             const disabled = division.teams?.length <= 2 || division.results?.length > 0;
             let mainButton = ''
-            if (!disabled) {
-              mainButton = `<button type="button" disabled="${!registration_complete}" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="startDivision(${index})">Start</button>`
+            if (!disabled && registration_complete_local) {
+              mainButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="startDivision(${index})">Start</button>`
             }
             if (division.results?.length > 0 && division.results.filter(res =>  res.completed).length === division.results.length) {
               mainButton = `<button type="button" class="form-control btn btn-primary pull-right" style="margin-bottom: 5px" onclick="setFinals(${index})">Set Finals</button>`
@@ -593,15 +594,16 @@
 
         var raw = JSON.stringify({"divisions": divisions, "registration_complete": registration_complete, "full_registration_state": full_registration_state});
         const bucketId = document.getElementById('tournamentName').value;
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'
-        };
-        fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, requestOptions
-        ).then()
+        if (upload_state) {
+          var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+          };
+          fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, requestOptions
+          ).then()
+        }
     }
 
     function addDivision() {

@@ -236,7 +236,7 @@
             setTable();
             divisions = JSON.parse(window.localStorage.getItem('divisions'));
             divisionsIndexes = JSON.parse(window.localStorage.getItem('divisionsIndexes'));
-            saveInTournament();
+            // saveInTournament();
         }
 
     }
@@ -314,7 +314,7 @@
         document.getElementById("newPlayerDivision").value = null
         document.getElementById("newPlayer1Bi").value = null
         document.getElementById("newPlayer2Bi").value = null
-        saveInTournament()
+        // saveInTournament()
         setTable()
     }
 
@@ -385,7 +385,7 @@
         const team = { "p1": XL_row_object[playerIndex].P1Name, "p2": XL_row_object[playerIndex].P2Name, "setsWon": 0, "setsLost": 0, "pointsDifference": 0, "gamesPlayed": 0, "id": XL_row_object[playerIndex].id };
         divisions[divisionIndex].teams.push(team);
         console.log(divisions);
-        saveInTournament();
+        // saveInTournament();
 
     }
 
@@ -399,7 +399,7 @@
             }
         });
         divisions[divisionIndex].teams = updatedTeams;
-        saveInTournament();
+        // saveInTournament();
     }
 
     function saveInTournament() {
