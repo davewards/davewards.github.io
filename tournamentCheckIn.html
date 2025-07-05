@@ -224,7 +224,7 @@
     <script>
     document.getElementById('fileInput').addEventListener('change', handleFile, false);
     document.getElementById('registration_complete_toggle').addEventListener('change', saveInTournament)
-    let XL_row_object = [];
+    let XL_row_object;
     let divisionsIndexes = [];
     let divisions = [];
     window.onload = function() {
@@ -282,7 +282,7 @@
             const workbook = XLSX.read(data, { type: 'array' });
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
-            XL_row_object.concat(XLSX.utils.sheet_to_row_object_array(worksheet));
+            XL_row_object = XLSX.utils.sheet_to_row_object_array(worksheet);
             XL_row_object.forEach((item) => {
                 item.isAttending = false;
                 item.P1Name = item["Player 1 First Name"] + ' ' + item["Player 1 Surname"];
