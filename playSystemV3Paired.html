@@ -287,7 +287,7 @@
                 </div>
             </form>
             <div class="row align-items-start" style="margin-top: 30px">
-                <h3 style="width: 100%; border-bottom: 1px solid lightgrey; background-color: #c4e3c4"><span id="playerCount" style="margin-right: 10px"></span>Present</h3>
+                <h3 style="width: 100%; border-bottom: 1px solid lightgrey; background-color: #c4e3c4"><span id="playerCount" style="margin-right: 10px"></span>Present<span id="playerDivCount" style="float: right"></span></h3>
                 <table class="table" id="playerTable">
                     <thead>
                         <th>Attending</th>
@@ -323,7 +323,7 @@
         let resetPools = [];
         let gradedGamesCount = 0;
         let playersChanged = false
-
+        let totalGamesPlayed = 0
 
 
         setTable(players)
@@ -405,18 +405,24 @@
                     const addTwo = count % perPool > 2
                     let seenPlayers = []
                     bucketPlayers(availablePlayers).then(resp => {
-
-
+                        let keys = Object.keys(resp)
+                        if (totalGamesPlayed % 2 === 0) keys.reverse()
                         let loop = [...Array(courtsAvailable || 4)].map((_, i) => {
                             if (gradedPools.length < i) {
                                 gradedPools.push([])
                             }
-                            Object.keys(resp).map(key => {
+                            
+                            keys.map(key => {
                                 const block = resp[key]
                                 block.map((player, index) => {
 
                                     if (!gradedPools[i]) gradedPools.push([])
-                                    if (gradedPools[i].length < perPool || i + 1 == courtsAvailable || (gradedPools[i].length == perPool && i + 2 == courtsAvailable && addOne) || (gradedPools[i].length == perPool && i + 3 == courtsAvailable && addTwo)) {
+                                    if (
+                                      gradedPools[i].length < perPool || 
+                                      i + 1 == courtsAvailable || 
+                                      (gradedPools[i].length == perPool && i + 2 == courtsAvailable && addOne) || 
+                                      (gradedPools[i].length == perPool && i + 3 == courtsAvailable && addTwo)
+                                      ) {
                                         if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
                                             gradedPools[i].push(player)
                                             seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
@@ -425,7 +431,8 @@
                                 })
                             })
                         });
-                        resolve(gradedPools)
+                        if (totalGamesPlayed % 2 === 0) resolve(gradedPools.reverse())
+                        else resolve(gradedPools)
 
                     })
                 }
@@ -445,6 +452,8 @@
                 document.getElementById("courtsAvailable").value = 8
             }
 
+            totalGamesPlayed  += 1
+
             let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
             if (document.getElementById('graded').checked) {
                 courtsAvailable = parseInt(courtsAvailable)
@@ -454,6 +463,18 @@
                 if (availablePlayers.length / 4 < courtsAvailable) {
                     courtsAvailable = Math.floor(availablePlayers.length / 4)
                 }
+                //return here
+                let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
+                if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
+                availablePlayers = availablePlayers.sort(comparePlayCounts)
+                let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
+                if (playersForGames.length < maxPlayers) {
+                    playersForGames = playersForGames.concat(
+                        getNext(availablePlayers.filter(player => !playersForGames.includes(player[0])))
+                        .slice(0, maxPlayers - playersForGames.length)
+                        .map(player => player[0]))
+                }
+                playersForGames = playersForGames.slice(0, maxPlayers);
                 setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
                     let courtDivision = resp.length
                     let currentCourt = 1
@@ -608,8 +629,6 @@
                 courts[current_court].push(player)
                 document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
             })
-
-            console.log(playersForGames)
 
             players = players.map(player => {
                 if (availablePlayersNames.includes(player[0])) {
@@ -831,6 +850,18 @@
             document.getElementById("tableRows").innerHTML = playerRows
             document.getElementById("tableRowsAttending").innerHTML = playerRowsAttending
             document.getElementById("playerCount").innerHTML = playerCount
+            let countMessage = ''
+            if (players.filter(p => p[4] && parseInt(p[1]) === 1).length) countMessage += `Div 1 : ${players.filter(p => p[4] && parseInt(p[1]) ===  1).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 2).length) countMessage += `Div 2 : ${players.filter(p => p[4] && parseInt(p[1]) ===  2).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 3).length) countMessage += `Div 3 : ${players.filter(p => p[4] && parseInt(p[1]) ===  3).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 4).length) countMessage += `Div 4 : ${players.filter(p => p[4] && parseInt(p[1]) ===  4).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 5).length) countMessage += `Div 5 : ${players.filter(p => p[4] && parseInt(p[1]) ===  5).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 6).length) countMessage += `Div 6 : ${players.filter(p => p[4] && parseInt(p[1]) ===  6).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 7).length) countMessage += `Div 7 : ${players.filter(p => p[4] && parseInt(p[1]) ===  7).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 8).length) countMessage += `Div 8 : ${players.filter(p => p[4] && parseInt(p[1]) ===  8).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 9).length) countMessage += `Div 9 : ${players.filter(p => p[4] && parseInt(p[1]) ===  9).length}, `
+            if (players.filter(p => p[4] && parseInt(p[1]) === 10).length) countMessage += `Div 10 : ${players.filter(p => p[4] && parseInt(p[1]) ===  10).length}, `
+            document.getElementById("playerDivCount").innerHTML = countMessage
         }
 
         function toggleAttending(index) {
