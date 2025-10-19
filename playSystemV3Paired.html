@@ -5,11 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" type="image/x-icon" sizes="180x180" href="./favicon.ico">
     <title>Badminton Play Schedule</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     <style>
-        .container {
+      * {
+            font-family: 'Helvetica';
+      }
+
+      .container {
         margin: 50px auto;
       }
       .hover:hover {
@@ -31,6 +36,7 @@
       }
       .playerBlock {
         margin-left: 10px;
+        font-size: 38px;
       }
       /* The switch - the box around the slider */
       .switch {
@@ -98,6 +104,15 @@
       .slider.round:before {
         border-radius: 50%;
       }
+
+      button {
+        border: 1px solid #878787 !important;
+        font-size: 20px;
+      }
+
+      td {
+        font-size: 18px;
+      }
     </style>
 </head>
 
@@ -126,6 +141,7 @@
                             <div class="court1Player playerBlock" id="player1"></div>
                             <div class="court1Player playerBlock" id="player2"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court1Player playerBlock" id="player3"></div>
                             <div class="court1Player playerBlock" id="player4"></div>
@@ -139,6 +155,7 @@
                             <div class="court2Player playerBlock" id="player5"></div>
                             <div class="court2Player playerBlock" id="player6"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court2Player playerBlock" id="player7"></div>
                             <div class="court2Player playerBlock" id="player8"></div>
@@ -152,6 +169,7 @@
                             <div class="court3Player playerBlock" id="player9"></div>
                             <div class="court3Player playerBlock" id="player10"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court3Player playerBlock" id="player11"></div>
                             <div class="court3Player playerBlock" id="player12"></div>
@@ -165,6 +183,7 @@
                             <div class="court4Player playerBlock" id="player13"></div>
                             <div class="court4Player playerBlock" id="player14"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court4Player playerBlock" id="player15"></div>
                             <div class="court4Player playerBlock" id="player16"></div>
@@ -178,6 +197,7 @@
                             <div class="court5Player playerBlock" id="player17"></div>
                             <div class="court5Player playerBlock" id="player18"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court5Player playerBlock" id="player19"></div>
                             <div class="court5Player playerBlock" id="player20"></div>
@@ -191,6 +211,7 @@
                             <div class="court6Player playerBlock" id="player21"></div>
                             <div class="court6Player playerBlock" id="player22"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court6Player playerBlock" id="player23"></div>
                             <div class="court6Player playerBlock" id="player24"></div>
@@ -204,6 +225,7 @@
                             <div class="court7Player playerBlock" id="player25"></div>
                             <div class="court7Player playerBlock" id="player26"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court7Player playerBlock" id="player27"></div>
                             <div class="court7Player playerBlock" id="player28"></div>
@@ -217,6 +239,7 @@
                             <div class="court8Player playerBlock" id="player29"></div>
                             <div class="court8Player playerBlock" id="player30"></div>
                         </div>
+                        <hr />
                         <div class="row">
                             <div class="court8Player playerBlock" id="player31"></div>
                             <div class="court8Player playerBlock" id="player32"></div>
@@ -226,16 +249,15 @@
             </div>
             <div class="row">
                 <div class=" col-sm-12 col-md-3 mt-3 mb-3">
-                    <button id="newGame" onclick="setGames()" style="background-color: #7ba1ea; width: 100%;">Next Game</button>
+                    <button id="newGame" onclick="setGames()" style="background-color: #7ba1ea80; width: 100%;">Next Game</button>
                 </div>
                 <div class=" col-sm-12 col-md-3 mt-3 mb-3 float-right">
-                    <button id="announceGame" onclick="announcePlayers()" style="background-color: #7bc1ea; width: 100%;">Announce Players</button>
+                    <button id="announceGame" onclick="announcePlayers()" style="background-color: #7bc1ea80; width: 100%;">Announce Players</button>
                 </div>
                 <div class=" col-sm-12 col-md-3 mt-3 mb-3 float-right">
-                    <button id="startTimer" onclick="startTimer()" style="background-color: #61ad71; width: 100%;">Start Timer</button>
+                    <button id="startTimer" onclick="startTimer()" style="background-color: #61ad7180; width: 100%;">Start Timer</button>
                 </div>
                 <div class=" col-sm-12 col-md-3 mt-3 mb-3 float-right">
-                    <button id="startTimer" onclick="resetPlayers()" style="background-color: #997bd3; width: 100%;">Load Last State</button>
                 </div>
             </div>
             <div class="row align-items-start">
@@ -341,7 +363,7 @@
         }
 
         function comparePlayCounts(a, b) {
-            return a[2] - b[2] || b[4] - a[4];
+            return a[2] - b[2] || Math.random() - Math.random();
         }
 
         function comparePlayerNames(a, b) {
@@ -406,23 +428,25 @@
                     let seenPlayers = []
                     bucketPlayers(availablePlayers).then(resp => {
                         let keys = Object.keys(resp)
-                        if (totalGamesPlayed % 2 === 0) keys.reverse()
+
+                        if (totalGamesPlayed % 2 === 0) keys.reverse() // every two games, fill the groups from highest grade to lowest grade
+
                         let loop = [...Array(courtsAvailable || 4)].map((_, i) => {
                             if (gradedPools.length < i) {
                                 gradedPools.push([])
                             }
-                            
+
                             keys.map(key => {
                                 const block = resp[key]
                                 block.map((player, index) => {
 
                                     if (!gradedPools[i]) gradedPools.push([])
                                     if (
-                                      gradedPools[i].length < perPool || 
-                                      i + 1 == courtsAvailable || 
-                                      (gradedPools[i].length == perPool && i + 2 == courtsAvailable && addOne) || 
-                                      (gradedPools[i].length == perPool && i + 3 == courtsAvailable && addTwo)
-                                      ) {
+                                        gradedPools[i].length < perPool ||
+                                        i + 1 == courtsAvailable ||
+                                        (gradedPools[i].length == perPool && i + 2 == courtsAvailable && addOne) ||
+                                        (gradedPools[i].length == perPool && i + 3 == courtsAvailable && addTwo)
+                                    ) {
                                         if (!seenPlayers.includes(`${player[0]}${player[1]}${player[2]}`)) {
                                             gradedPools[i].push(player)
                                             seenPlayers.push(`${player[0]}${player[1]}${player[2]}`)
@@ -441,6 +465,9 @@
         }
 
         function setGames() {
+          if (!confirm("Please confirm that you intended to set the next game and didn't hit it by accident or are being an eejit and messing with the system!!")) {
+            alert("Thank you for being honest.")
+          } else {
             let s = [...Array(32)].map((_, i) => document.getElementById("player" + (i + 1)).innerHTML = '')
             let availablePlayers = players.filter(player => player[4])
 
@@ -452,7 +479,7 @@
                 document.getElementById("courtsAvailable").value = 8
             }
 
-            totalGamesPlayed  += 1
+            totalGamesPlayed += 1
 
             let t = [...Array(8)].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "none")
             if (document.getElementById('graded').checked) {
@@ -463,22 +490,25 @@
                 if (availablePlayers.length / 4 < courtsAvailable) {
                     courtsAvailable = Math.floor(availablePlayers.length / 4)
                 }
-                //return here
+
                 let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
                 if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
                 availablePlayers = availablePlayers.sort(comparePlayCounts)
-                let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player[0]);
+                
+                let playersForGames = availablePlayers.filter(player => player[3] === 'Waiting').map(player => player);
+                
                 if (playersForGames.length < maxPlayers) {
                     playersForGames = playersForGames.concat(
-                        getNext(availablePlayers.filter(player => !playersForGames.includes(player[0])))
+                        getNext(availablePlayers.filter(player => !playersForGames.includes(player)))
                         .slice(0, maxPlayers - playersForGames.length)
-                        .map(player => player[0]))
+                        .map(player => player))
                 }
                 playersForGames = playersForGames.slice(0, maxPlayers);
-                setGradedPools(availablePlayers, parseInt(courtsAvailable)).then(resp => {
+
+                setGradedPools(playersForGames, parseInt(courtsAvailable)).then(resp => {
                     let courtDivision = resp.length
                     let currentCourt = 1
-                    // console.log(resp)
+                    
                     for (let court of resp) {
                         if (court.length < 4) continue
                         let playersThisBlock = court.sort(comparePlayCounts).filter(player => player[3] === 'Waiting').map(player => player);
@@ -489,13 +519,14 @@
                                 seenPlayers.push(player[0])
                             }
                         })
-                        // console.log(playersThisBlock.map(player => `${player[0]}-${player[1]}-${player[2]}-${player[3]}`))
+
                         players = players.map(player => {
                             if (seenPlayers.includes(player[0]) && !seenPlayers.slice(0, 4).includes(player[0])) {
                                 player[3] = 'Waiting'
                             }
                             return player
                         })
+
                         setGamesStandard(playersThisBlock.slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
                         currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
                     }
@@ -504,6 +535,7 @@
                 setGamesStandardNotGraded(availablePlayers, courtsAvailable)
             }
             let u = [...Array(parseInt(courtsAvailable))].map((_, i) => document.getElementById("court" + (i + 1)).style.display = "block")
+          }
         }
 
         function shiftArrayToRight(arr, places) {
@@ -551,7 +583,7 @@
             let courts = []
             let courtsGrades = []
             let seenPlayers = []
-            // console.log(averageGrade)
+
             let loop = [...Array(parseInt(courtsAvailable))].map((_, court) => {
                 if (courts.length < court + 1) courts.push([])
                 if (courtsGrades.length < court + 1) courtsGrades.push([])
@@ -627,7 +659,7 @@
                     current_court += 1
                 }
                 courts[current_court].push(player)
-                document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
+                document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h3>${player}</h3>`
             })
 
             players = players.map(player => {
@@ -692,7 +724,7 @@
                     current_court += 1
                 }
                 courts[current_court].push(player)
-                document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h4>${player}</h4>`
+                document.getElementById("player" + (index + matchStartCount)).innerHTML = `<h3>${player}</h3>`
             })
 
 
@@ -767,66 +799,33 @@
 
         }
 
-        function setGamesGradedOld(availablePlayers, courtsAvailable) {
-            let maxPlayers = Math.floor(availablePlayers.length / 4) * 4;
-            if (maxPlayers > courtsAvailable * 4) maxPlayers = courtsAvailable * 4
-            availablePlayers = availablePlayers.sort(compareDivisions)
-            let grades = { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [] }
-
-            let lastDivision = parseInt(availablePlayers[0][1])
-            const playerCount = availablePlayers.length
-
-            let maxPlayersPerGroup = playerCount / courtsAvailable > 4 ? (playerCount / courtsAvailable) + Math.floor(playerCount % courtsAvailable) : 4
-
-            if (playerCount / maxPlayersPerGroup < 4) {
-                maxPlayersPerGroup = Math.floor(playerCount / 4)
-            }
-            availablePlayers.map(player => {
-                let division = player[1]
-                if (grades[lastDivision].length < maxPlayersPerGroup) {
-                    grades[lastDivision].push(player)
-                } else if (grades[player[1]].length >= maxPlayersPerGroup) {
-                    grades[parseInt(player[1]) + 1].push(player)
-                } else {
-                    grades[parseInt(player[1])].push(player)
-                }
-            })
-            let currentCourt = 1
-            lastDivision = parseInt(availablePlayers[0][1])
-            Object.values(grades).map((division, index) => {
-                grades[index] = division.sort(comparePlayCounts)
-            })
-            Object.values(grades).map((division, index) => {
-                if (index > 1 && index < grades.length) {
-                    if (grades[index + 1].length > 0 && grades[lastDivision].length < maxPlayersPerGroup && grades[lastDivision].length <= 4 + Math.floor(playerCount % courtsAvailable)) {
-
-                        while (grades[lastDivision].length < 4 + (playerCount % courtsAvailable) && grades[index + 1].length > 0) {
-                            grades[lastDivision].push(grades[index + 1].shift())
-                        }
-                        if (grades[index + 1].length > 0) lastDivision = index + 1
-                    } else {
-                        lastDivision = index + 1
-                    }
-                }
-            })
-            for (let division of Object.values(grades)) {
-                if (division.length == 0) continue
-                setGamesStandard(division, courtsAvailable, currentCourt, false)
-                currentCourt += 4
-            }
-            // setTable()
-        }
-
         function getNext(array) {
             return array.sort(comparePlayCounts)
-
         }
 
-        function shuffle(array) {
+        function shuffleOld(array) {
             array = array.map(value => ({ value, sort: Math.random() }))
                 .sort((a, b) => a.sort - b.sort)
                 .map(({ value }) => value)
 
+            return array;
+        }
+
+        function shuffle(array) {
+            var m = array.length,
+                t, i;
+
+            // While there remain elements to shuffle…
+            while (m) {
+
+                // Pick a remaining element…
+                i = Math.floor(Math.random() * m--);
+
+                // And swap it with the current element.
+                t = array[m];
+                array[m] = array[i];
+                array[i] = t;
+            }
 
             return array;
         }
@@ -841,9 +840,9 @@
             players.sort((a, b) => a[0].localeCompare(b[0])).map((player, index) => {
                 if (player[4]) {
                     playerCount += 1
-                    playerRowsAttending += `<tr><td><button class="hover" style="background-color: #eb6f6f; width: 100%" onclick="toggleAttending(${index})">Remove</button></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td><button style="width: 100%" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
+                    playerRowsAttending += `<tr><td><button class="hover" style="background-color: #eb6f6f80; width: 100%" onclick="toggleAttending(${index})">Remove</button></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td><button style="width: 100%" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
                 } else {
-                    playerRows += `<tr><td><button class="hover" style="background-color: #5db35d; width: 100%" onclick="toggleAttending(${index})">Add</button></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
+                    playerRows += `<tr><td><button class="hover" style="background-color: #5db35d80; width: 100%" onclick="toggleAttending(${index})">Add</button></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
                 }
             })
 
@@ -866,6 +865,7 @@
 
         function toggleAttending(index) {
             players[index][4] = !players[index][4]
+            if (players[index][4] && players[index][2] == 0) players[index][2] = getAveragePlayCount()
             playersChanged = true
             setTable()
         }
@@ -910,6 +910,12 @@
             setTable()
         }
 
+        function getAveragePlayCount(){
+            if (!players.filter(p => p[4]).length) return 0
+            let averageCount = Math.round(players.reduce((sum, obj) => sum + obj[2], 0) / players.filter(p => p[4]).length)
+            return averageCount
+        }
+
         function processForm(e) {
             if (e.preventDefault) e.preventDefault();
 
@@ -919,7 +925,7 @@
                 document.getElementById("newPlayer").value = null;
                 document.getElementById("newPlayerDivision").value = null;
                 document.getElementById("formWarning").innerHTML = "";
-                players.push([playerName, playerDivision, 0, 'Waiting', true, {}, 0])
+                players.push([playerName, playerDivision, getAveragePlayCount(), 'Waiting', true, {}, 0])
             } else {
                 document.getElementById("formWarning").innerHTML = "Please add player name and division";
             }
@@ -981,9 +987,8 @@
                 if (timer === 0) {
                     display.textContent = ''
                     const synth = window.speechSynthesis
-                    let ourText = "Last Serve!!!"
+                    let ourText = "Last Serve"
                     const utterThis = new SpeechSynthesisUtterance(ourText)
-
                     synth.speak(utterThis)
                     clearInterval(timeInterval)
                     document.getElementById('showTimer').style.display = 'none';
