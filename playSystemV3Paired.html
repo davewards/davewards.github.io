@@ -504,7 +504,10 @@
                         .map(player => player))
                 }
                 playersForGames = playersForGames.slice(0, maxPlayers);
-
+                players = players.map(player => {
+                    player[3] = 'Waiting'
+                    return player
+                })
                 setGradedPools(playersForGames, parseInt(courtsAvailable)).then(resp => {
                     let courtDivision = resp.length
                     let currentCourt = 1
@@ -521,13 +524,15 @@
                         })
 
                         players = players.map(player => {
-                            if (seenPlayers.includes(player[0]) && !seenPlayers.slice(0, 4).includes(player[0])) {
-                                player[3] = 'Waiting'
+                            if (playersThisBlock.slice(0, 4).map(p => p[0]).includes(player[0])) {
+                              player[3] = 'Playing'
+                              player[2] = player[2] + 1
                             }
                             return player
                         })
 
-                        setGamesStandard(playersThisBlock.slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false)
+
+                        setGamesStandard(playersThisBlock.slice(0, 4), parseInt(courtsAvailable), currentCourt, true, false, null, true)
                         currentCourt += courtDivision < parseInt(courtsAvailable) ? 4 * courtDivision : 4
                     }
                 })
@@ -681,7 +686,7 @@
 
         }
 
-        function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, graded = false, performShuffle = true, maxCount = null) {
+        function setGamesStandard(availablePlayers, courtsAvailable, matchStartCount = 1, graded = false, performShuffle = true, maxCount = null, skipSetting=false) {
 
             var MAX = 3;
             var rand = Math.floor((Math.random() * MAX) + 1);
@@ -730,8 +735,10 @@
 
             players = players.map(player => {
                 if (availablePlayersNames.includes(player[0])) {
-                    player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
-                    player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
+                    if (!skipSetting) {
+                      player[3] = playersForGames.includes(player[0]) ? 'Playing' : 'Waiting'
+                      player[2] = playersForGames.includes(player[0]) ? player[2] + 1 : player[2]
+                    }
 
                     for (let court of courts) {
                         if (court.includes(player[0])) {
