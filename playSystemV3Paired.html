@@ -267,12 +267,16 @@
                     <label>How many minutes per game</label>
                     <input type="number" class="form-control" id="minutesPerGame" name="" min="1" max="25" value="8" placeholder="How many minutes per game?">
                 </div>
-                <div class="col-sm-12 col-md-4 pl-4 float-left text-left">
+                <div class="col-sm-12 col-md-3 pl-4 float-left text-left">
                     <label>Upload player file (data is local only)</label>
                     <input type="file" class="form-control" id="csv" name="googleSheetURL" placeholder="Load local CSV file">
                     <label style="text-align: left;">File format expected: <b>CSV</b>. <br>Two columns: Name, Division. Eg. <br>Player One,4<br>Player Two,6</label>
                 </div>
-                <div class="col-sm-12 col-md-4 pl-4 float-left">
+                <div class="col-sm-12 col-md-2 pl-4 float-left">
+                    <label>Export Current set of Players</label>
+                    <button id="downloadPlayers" onclick="downloadBlob()" style="background-color: #61ad7180; width: 100%;">Download Players</button>
+                </div>
+                <div class="col-sm-12 col-md-2 pl-4 float-left text-center">
                     <label>Player Mode</label><br />
                     <label>Random</label>
                     <label class="switch">
@@ -303,7 +307,16 @@
                     <div class="col-sm-12 col-md-4 pl-4 float-left">
                         <input type="number" class="form-control" id="newPlayerDivision" name="newPlayerDivision" placeholder="Type division">
                     </div>
-                    <div class="col-sm-12 col-md-4 pl-4 float-left">
+                    <div class="col-sm-12 col-md-2 pl-4 float-left text-center">
+                        <label>Player has paid</label><br />
+                        <label>No</label>
+                        <label class="switch">
+                            <input type="checkbox" id="newPlayerPaid">
+                            <span class="slider"></span>
+                        </label>
+                        <label>Yes</label>
+                    </div>
+                    <div class="col-sm-12 col-md-2 pl-4 float-left">
                         <button id="submitPlayer" class="form-control">Add Player</button>
                     </div>
                 </div>
@@ -317,6 +330,7 @@
                         <th>Games Played</th>
                         <th>Division</th>
                         <th>Status</th>
+                        <th>Paid</th>
                         <th></th>
                     </thead>
                     <tbody id="tableRowsAttending">
@@ -332,6 +346,7 @@
                         <th>Games Played</th>
                         <th>Division</th>
                         <th>Status</th>
+                        <th>Paid</th>
                     </thead>
                     <tbody id="tableRows">
                     </tbody>
@@ -753,7 +768,6 @@
             })
             setTable()
 
-
         }
 
         function chunkArray(arr, n) {
@@ -847,9 +861,9 @@
             players.sort((a, b) => a[0].localeCompare(b[0])).map((player, index) => {
                 if (player[4]) {
                     playerCount += 1
-                    playerRowsAttending += `<tr><td><button class="hover" style="background-color: #eb6f6f80; width: 100%" onclick="toggleAttending(${index})">Remove</button></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td><button style="width: 100%" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
+                    playerRowsAttending += `<tr><td><button class="hover" style="background-color: #eb6f6f80; width: 100%" onclick="toggleAttending(${index})">Remove</button></td><td>${player[0]}</td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementPlayCount(${index})">-</button>${player[2]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementPlayCount(${index})">+</button></td><td><button style="margin-right: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="decrementGrade(${index})">-</button>${player[1]}<button style="margin-left: 10px; border: 1px solid lightgrey; padding: 5px 10px; box-shadow: 3px 3px 3px lightgrey; background-color: white; height: 30px;" onclick="incrementGrade(${index})">+</button></td><td>${player[3]}</td><td>${player[7]}<button style="width: 50px" onclick="togglePaid(${index})">Set</button></td><td><button style="width: 100%" onclick="togglePlaying(${index})">Toggle Playing</button></td></tr>`
                 } else {
-                    playerRows += `<tr><td><button class="hover" style="background-color: #5db35d80; width: 100%" onclick="toggleAttending(${index})">Add</button></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td></tr>`
+                    playerRows += `<tr><td><button class="hover" style="background-color: #5db35d80; width: 100%" onclick="toggleAttending(${index})">Add</button></td><td>${player[0]}</td><td>${player[2]}</td><td>${player[1]}</td><td>${player[3]}</td><td>${player[7]}<button style="width: 50px" onclick="togglePaid(${index})">Set</button></td></tr>`
                 }
             })
 
@@ -907,6 +921,11 @@
             }
         }
 
+        function togglePaid(index) {
+            players[index][7] = !players[index][7]
+            setTable()
+        }
+
         function markWinner(name) {
             players = players.map(player => {
                 if (player[0] === name) {
@@ -928,11 +947,14 @@
 
             const playerName = document.getElementById("newPlayer").value;
             const playerDivision = parseFloat(document.getElementById("newPlayerDivision").value);
+            const playerPaid = document.getElementById("newPlayerPaid").checked;
+            console.log(playerPaid)
             if (playerName && playerDivision) {
                 document.getElementById("newPlayer").value = null;
                 document.getElementById("newPlayerDivision").value = null;
+                document.getElementById("newPlayerPaid").checked = false;
                 document.getElementById("formWarning").innerHTML = "";
-                players.push([playerName, playerDivision, getAveragePlayCount(), 'Waiting', true, {}, 0])
+                players.push([playerName, playerDivision, getAveragePlayCount(), 'Waiting', true, {}, 0, playerPaid])
             } else {
                 document.getElementById("formWarning").innerHTML = "Please add player name and division";
             }
@@ -1018,7 +1040,11 @@
                 Promise.all(reader.result.split('ï»¿').join('').split('\r').join('').split('\n').map(row => {
                     let player = row.split(',')
                     if (player.length > 1) {
-                        players.push([player[0], parseFloat(player[1]), 0, 'Waiting', false, {}, 0])
+                        let isPaid = true
+                        if (player.length > 2) {
+                          isPaid = player[2] === 'true'
+                        }
+                        players.push([player[0], parseFloat(player[1]), 0, 'Waiting', false, {}, 0, isPaid])
                     }
                 })).then(setTable())
 
@@ -1034,6 +1060,25 @@
         }
 
         fileInput.addEventListener('change', readFile)
+
+        function arrayToCsv(){
+          return players.map(player => [player[0], player[1], player[7], player[2]]).join('\r\n');  // rows starting on new lines
+        }
+
+        function downloadBlob() {
+          const content = arrayToCsv()
+          const filename = 'currentPlayers.csv'
+          const contentType = 'text/csv;charset=utf-8;'
+          // Create a blob
+          var blob = new Blob([content], { type: contentType });
+          var url = URL.createObjectURL(blob);
+
+          // Create a link to download it
+          var pom = document.createElement('a');
+          pom.href = url;
+          pom.setAttribute('download', filename);
+          pom.click();
+        }
         </script>
     </body>
 
