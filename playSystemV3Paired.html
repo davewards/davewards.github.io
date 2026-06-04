@@ -1067,7 +1067,7 @@
 
         function downloadBlob() {
           const content = arrayToCsv()
-          const filename = 'currentPlayers.csv'
+          const filename = 'currentPlayers' + new Date().toLocaleDateString().split('/').join('-') + '.csv'
           const contentType = 'text/csv;charset=utf-8;'
           // Create a blob
           var blob = new Blob([content], { type: contentType });
