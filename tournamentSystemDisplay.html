@@ -146,18 +146,32 @@
     let divisions = []
     let currentResultDetails = {divisionIndex: null, resultIndex: null, isUpdate: false, isSemi: false, isFinal:false}
 
+
+    function wait(delay){
+        return new Promise((resolve) => setTimeout(resolve, delay));
+    }
     
+    function retrieveTournamentDetails(tries){
+        
+        function onError(err){
+            triesLeft = tries - 1;
+            if(!triesLeft){
+                throw err;
+            }
+            return wait(10000).then(() => retrieveTournamentDetails(triesLeft));
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const bucketId = urlParams.get('bucketId');
+        fetch("https://getpantry.cloud/apiv1/pantry/b13e127b-9319-480e-a976-d53846169c26/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
+          resp.json().then(data => {
+              divisions = data.divisions
+              setDivisions()
+          })
+        }).catch(onError);
+    }
 
     function loadLastState() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const bucketId = urlParams.get('bucketId');
-      fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
-        resp.json().then(data => {
-            divisions = data.divisions
-            setDivisions()
-        })
-      })
-
+      retrieveTournamentDetails(5)
     }
 
 
