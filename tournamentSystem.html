@@ -145,6 +145,9 @@
         <div class="col-sm-12 col-md-4 pl-4 float-left">
             <button type="button" class="btn btn-primary form-control" onclick="loadLastState()">Reload Last State</button>
         </div>
+        <div class="col-sm-12 col-md-4 pl-4 float-left">
+            <input type="file" class="form-control" id="fileUpload" name="googleSheetURL" placeholder="Load local CSV file">
+        </div>
     </div>
     <div class="row align-items-start">
         <h4 id="divisionFormWarning" style="text-align: left; padding-top: 5px"></h4>
@@ -155,6 +158,7 @@
             <button type="button" class="btn btn-primary form-control" onclick="addDivision()">Add Division</button>
         </div>
         <div class="col-sm-12 col-md-4 pl-4 float-left">
+            <button type="button" class="btn btn-primary form-control" onclick="downloadBlob()">Export To Local File</button>
         </div>
     </div>
   </div>
@@ -238,7 +242,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const bucketId = document.getElementById('tournamentName').value;
       window.localStorage.setItem('dataUUID', bucketId)
-      fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
+      fetch("https://getpantry.cloud/apiv1/pantry/b13e127b-9319-480e-a976-d53846169c26/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
         resp.json().then(data => {
             divisions = data.divisions
             registration_complete = data.registration_complete
@@ -267,6 +271,8 @@
         if (teams.length == 8) return setEightTeamTournament(teams, divisionIndex)
         if (teams.length == 9) return setNineTeamTournament(teams, divisionIndex)
         if (teams.length == 10) return setTenTeamTournament(teams, divisionIndex)
+        if (teams.length == 11) return setElevenTeamTournament(teams, divisionIndex)
+        if (teams.length == 12) return setTwelveTeamTournament(teams, divisionIndex)
     }
 
     function setFourTeamTournament(teams, divisionIndex) {
@@ -399,10 +405,55 @@
     }
 
     function setElevenTeamTournament(teams, divisionIndex) {
-        let results = [
-          {teamOneUUID: teams[4].id, teamTwoUUID: teams[2].id, teamOne: teams[4], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
-        ]
-        return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
+      let results = [
+        {teamOneUUID: teams[6].id, teamTwoUUID: teams[2].id, teamOne: teams[6], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[5].id, teamTwoUUID: teams[8].id, teamOne: teams[5], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3].id, teamTwoUUID: teams[4].id, teamOne: teams[3], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[7].id, teamTwoUUID: teams[1].id, teamOne: teams[7], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11].id, teamTwoUUID: teams[2].id, teamOne: teams[11], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[9].id, teamTwoUUID: teams[10].id, teamOne: teams[9], teamTwo: teams[10], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[4].id, teamTwoUUID: teams[8].id, teamOne: teams[4], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6].id, teamTwoUUID: teams[1].id, teamOne: teams[6], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[4].id, teamTwoUUID: teams[11].id, teamOne: teams[4], teamTwo: teams[11], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[7].id, teamTwoUUID: teams[9].id, teamOne: teams[7], teamTwo: teams[9], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10].id, teamTwoUUID: teams[5].id, teamOne: teams[10], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[2].id, teamTwoUUID: teams[3].id, teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6].id, teamTwoUUID: teams[7].id, teamOne: teams[6], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10].id, teamTwoUUID: teams[8].id, teamOne: teams[10], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3].id, teamTwoUUID: teams[1].id, teamOne: teams[3], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11].id, teamTwoUUID: teams[7].id, teamOne: teams[11], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[5].id, teamTwoUUID: teams[4].id, teamOne: teams[5], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[2].id, teamTwoUUID: teams[8].id, teamOne: teams[2], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6].id, teamTwoUUID: teams[9].id, teamOne: teams[6], teamTwo: teams[9], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11].id, teamTwoUUID: teams[1].id, teamOne: teams[11], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10].id, teamTwoUUID: teams[3].id, teamOne: teams[10], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[9].id, teamTwoUUID: teams[5].id, teamOne: teams[9], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false}
+      ]
+      return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
+    }
+
+    function setTwelveTeamTournament(teams, divisionIndex) {
+      let results = [
+        {teamOneUUID: teams[10].id, teamTwoUUID: teams[2].id, teamOne: teams[10], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3].id, teamTwoUUID: teams[11].id, teamOne: teams[3], teamTwo: teams[11], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[1].id, teamTwoUUID: teams[4].id, teamOne: teams[1], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[8].id, teamTwoUUID: teams[7].id, teamOne: teams[8], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[12].id, teamTwoUUID: teams[5].id, teamOne: teams[12], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6].id, teamTwoUUID: teams[9].id, teamOne: teams[6], teamTwo: teams[9], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[5].id, teamTwoUUID: teams[3].id, teamOne: teams[5], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[7].id, teamTwoUUID: teams[12].id, teamOne: teams[7], teamTwo: teams[12], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11].id, teamTwoUUID: teams[6].id, teamOne: teams[11], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[4].id, teamTwoUUID: teams[9].id, teamOne: teams[4], teamTwo: teams[9], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10].id, teamTwoUUID: teams[8].id, teamOne: teams[10], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[2].id, teamTwoUUID: teams[1].id, teamOne: teams[2], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[12].id, teamTwoUUID: teams[10].id, teamOne: teams[12], teamTwo: teams[10], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3].id, teamTwoUUID: teams[7].id, teamOne: teams[3], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[8].id, teamTwoUUID: teams[1].id, teamOne: teams[8], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6].id, teamTwoUUID: teams[4].id, teamOne: teams[6], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[9].id, teamTwoUUID: teams[2].id, teamOne: teams[9], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11].id, teamTwoUUID: teams[5].id, teamOne: teams[11], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+      ]
+      return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
     }
 
     function setGamesTable(results, divisionIndex){
@@ -500,8 +551,51 @@
       `}
     }
 
+    function downloadBlob() {
+        var raw = JSON.stringify({"divisions": divisions, "registration_complete": registration_complete, "full_registration_state": full_registration_state});
+        const bucketId = document.getElementById('tournamentName').value;
+        const filename = bucketId + '.json'
+        const contentType = 'application/json;charset=utf-8;'
+        // Create a blob
+        var blob = new Blob([raw], { type: contentType });
+        var url = URL.createObjectURL(blob);
+
+        // Create a link to download it
+        var pom = document.createElement('a');
+        pom.href = url;
+        pom.setAttribute('download', filename);
+        pom.click();
+      }
+
+    function sendDataToStorage(divisions, registration_complete, full_registration_state, tries){
+        
+        function onError(err){
+            triesLeft = tries - 1;
+            if(!triesLeft){
+                throw err;
+            }
+            return wait(10000).then(() => sendDataToStorage(divisions, registration_complete, full_registration_state, triesLeft));
+        }
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var raw = JSON.stringify({"divisions": divisions, "registration_complete": registration_complete, "full_registration_state": full_registration_state});
+        const bucketId = document.getElementById('tournamentName').value;
+        
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+        fetch("https://getpantry.cloud/apiv1/pantry/b13e127b-9319-480e-a976-d53846169c26/basket/" + bucketId, requestOptions
+        ).then().catch(onError);
+    }
+
+    function wait(delay){
+        return new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
     function setDivisions(upload_state=true, registration_complete_local=registration_complete) {
-      console.log(registration_complete_local)
         const divisionBlocks = divisions.map((division, index) => {
             const teams = division.teams?.sort(function(a, b) { return b.setsWon - a.setsWon || (b.setsWon - b.setsLost) - (a.setsWon - a.setsLost) || b.pointsDifference - a.pointsDifference }).map((team, teamIndex) => {
               let removeButton = ''
@@ -591,20 +685,10 @@
         divisionsList.push(divisions)
         window.localStorage.setItem('divisions', JSON.stringify(divisionsList))
         document.getElementById("divisionBlock").innerHTML = divisionBlocks.join('');
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
+        
 
-        var raw = JSON.stringify({"divisions": divisions, "registration_complete": registration_complete, "full_registration_state": full_registration_state});
-        const bucketId = document.getElementById('tournamentName').value;
         if (upload_state) {
-          var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: raw,
-            redirect: 'follow'
-          };
-          fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, requestOptions
-          ).then()
+          sendDataToStorage(divisions, registration_complete, full_registration_state, 5)
         }
     }
 
@@ -796,6 +880,23 @@
       var win = window.open('/tournamentCheckIn.html', '_blank');
       win.focus();
     }
+
+    const fileInput = document.getElementById('fileUpload')
+      const readFile = () => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            const fileData = JSON.parse(reader.result)
+            //{"divisions": divisions, "registration_complete": registration_complete, "full_registration_state": full_registration_state}
+            divisions = fileData.divisions;
+            registration_complete = fileData.registration_complete;
+            full_registration_state = fileData.full_registration_state;
+            console.log(divisions)
+            setDivisions()
+          }
+          reader.readAsBinaryString(fileInput.files[0])
+      }
+
+      fileInput.addEventListener('change', readFile)
     </script>
 </body>
 
