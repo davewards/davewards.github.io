@@ -403,17 +403,17 @@
         // saveInTournament();
     }
 
-    function sendDataToStorage(tries){
+    function sendDataToStorage(tries, bucketId){
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        const bucketId = document.getElementById('tournamentName').value;
+        
         function onError(err){
             triesLeft = tries - 1;
             if(!triesLeft){
                 throw err;
             }
-            return wait(5).then(() => sendDataToStorage(triesLeft));
+            return wait(5).then(() => sendDataToStorage(triesLeft, bucketId));
         }
         var raw = JSON.stringify({ "divisions": divisions, "registration_complete": document.getElementById('registration_complete_toggle').checked, "full_registration_state": XL_row_object });
         var requestOptions = {
@@ -430,9 +430,9 @@
     }
 
     function saveInTournament() {
-        
+        const bucketId = document.getElementById('tournamentName').value;
         if (bucketId.length > 0) {
-            sendDataToStorage(5)
+            sendDataToStorage(5, bucketId)
         } else {
             confirm(`Please Provide Tournament Name`);
         }
