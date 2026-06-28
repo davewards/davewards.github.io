@@ -404,7 +404,10 @@
     }
 
     function sendDataToStorage(tries){
-        
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const bucketId = document.getElementById('tournamentName').value;
         function onError(err){
             triesLeft = tries - 1;
             if(!triesLeft){
@@ -427,10 +430,7 @@
     }
 
     function saveInTournament() {
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-        const bucketId = document.getElementById('tournamentName').value;
+        
         if (bucketId.length > 0) {
             sendDataToStorage(5)
         } else {
