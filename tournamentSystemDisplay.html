@@ -17,7 +17,7 @@
     }
 
     .scroll-div {
-      max-height: 350px;
+      max-height: 600px;
       overflow-y: auto;
     }
 
@@ -184,6 +184,9 @@
         if (teams.length == 7) return setSevenTeamTournament(teams, divisionIndex)
         if (teams.length == 8) return setEightTeamTournament(teams, divisionIndex)
         if (teams.length == 9) return setNineTeamTournament(teams, divisionIndex)
+        if (teams.length == 10) return setTenTeamTournament(teams, divisionIndex)
+        if (teams.length == 11) return setElevenTeamTournament(teams, divisionIndex)
+        if (teams.length == 12) return setTwelveTeamTournament(teams, divisionIndex)
     }
 
     function setFourTeamTournament(teams, divisionIndex) {
@@ -292,6 +295,79 @@
           {teamOne: teams[8], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
         ]
         return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
+    }
+
+    function setTenTeamTournament(teams, divisionIndex) {
+        let results = [
+          {teamOneUUID: teams[5].id, teamTwoUUID: teams[9].id, teamOne: teams[5], teamTwo: teams[9], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[1].id, teamTwoUUID: teams[6].id, teamOne: teams[1], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[0].id, teamTwoUUID: teams[2].id, teamOne: teams[0], teamTwo: teams[2], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[3].id, teamTwoUUID: teams[7].id, teamOne: teams[3], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[4].id, teamTwoUUID: teams[1].id, teamOne: teams[4], teamTwo: teams[1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[5].id, teamTwoUUID: teams[8].id, teamOne: teams[5], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[0].id, teamTwoUUID: teams[6].id, teamOne: teams[0], teamTwo: teams[6], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[7].id, teamTwoUUID: teams[9].id, teamOne: teams[7], teamTwo: teams[9], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[4].id, teamTwoUUID: teams[3].id, teamOne: teams[4], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[1].id, teamTwoUUID: teams[5].id, teamOne: teams[1], teamTwo: teams[5], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[2].id, teamTwoUUID: teams[7].id, teamOne: teams[2], teamTwo: teams[7], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[6].id, teamTwoUUID: teams[8].id, teamOne: teams[6], teamTwo: teams[8], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[9].id, teamTwoUUID: teams[4].id, teamOne: teams[9], teamTwo: teams[4], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[2].id, teamTwoUUID: teams[3].id, teamOne: teams[2], teamTwo: teams[3], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+          {teamOneUUID: teams[8].id, teamTwoUUID: teams[0].id, teamOne: teams[8], teamTwo: teams[0], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        ]
+        return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
+    }
+
+    function setElevenTeamTournament(teams, divisionIndex) {
+      let results = [
+        {teamOneUUID: teams[6-1].id, teamTwoUUID: teams[2-1].id, teamOne: teams[6-1], teamTwo: teams[2-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[5-1].id, teamTwoUUID: teams[8-1].id, teamOne: teams[5-1], teamTwo: teams[8-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3-1].id, teamTwoUUID: teams[4-1].id, teamOne: teams[3-1], teamTwo: teams[4-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[7-1].id, teamTwoUUID: teams[1-1].id, teamOne: teams[7-1], teamTwo: teams[1-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11-1].id, teamTwoUUID: teams[2-1].id, teamOne: teams[11-1], teamTwo: teams[2-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[9-1].id, teamTwoUUID: teams[10-1].id, teamOne: teams[9-1], teamTwo: teams[10-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[4-1].id, teamTwoUUID: teams[8-1].id, teamOne: teams[4-1], teamTwo: teams[8-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6-1].id, teamTwoUUID: teams[1-1].id, teamOne: teams[6-1], teamTwo: teams[1-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[4-1].id, teamTwoUUID: teams[11-1].id, teamOne: teams[4-1], teamTwo: teams[11-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[7-1].id, teamTwoUUID: teams[9-1].id, teamOne: teams[7-1], teamTwo: teams[9-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10-1].id, teamTwoUUID: teams[5-1].id, teamOne: teams[10-1], teamTwo: teams[5-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[2-1].id, teamTwoUUID: teams[3-1].id, teamOne: teams[2-1], teamTwo: teams[3-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6-1].id, teamTwoUUID: teams[7-1].id, teamOne: teams[6-1], teamTwo: teams[7-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10-1].id, teamTwoUUID: teams[8-1].id, teamOne: teams[10-1], teamTwo: teams[8-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3-1].id, teamTwoUUID: teams[1-1].id, teamOne: teams[3-1], teamTwo: teams[1-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11-1].id, teamTwoUUID: teams[7-1].id, teamOne: teams[11-1], teamTwo: teams[7-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[5-1].id, teamTwoUUID: teams[4-1].id, teamOne: teams[5-1], teamTwo: teams[4-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[2-1].id, teamTwoUUID: teams[8-1].id, teamOne: teams[2-1], teamTwo: teams[8-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6-1].id, teamTwoUUID: teams[9-1].id, teamOne: teams[6-1], teamTwo: teams[9-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11-1].id, teamTwoUUID: teams[1-1].id, teamOne: teams[11-1], teamTwo: teams[1-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10-1].id, teamTwoUUID: teams[3-1].id, teamOne: teams[10-1], teamTwo: teams[3-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[9-1].id, teamTwoUUID: teams[5-1].id, teamOne: teams[9-1], teamTwo: teams[5-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false}
+      ]
+      return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
+    }
+
+    function setTwelveTeamTournament(teams, divisionIndex) {
+      let results = [
+        {teamOneUUID: teams[10-1].id, teamTwoUUID: teams[2-1].id, teamOne: teams[10-1], teamTwo: teams[2-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3-1].id, teamTwoUUID: teams[11-1].id, teamOne: teams[3-1], teamTwo: teams[11-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[1-1].id, teamTwoUUID: teams[4-1].id, teamOne: teams[1-1], teamTwo: teams[4-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[8-1].id, teamTwoUUID: teams[7-1].id, teamOne: teams[8-1], teamTwo: teams[7-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[12-1].id, teamTwoUUID: teams[5-1].id, teamOne: teams[12-1], teamTwo: teams[5-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6-1].id, teamTwoUUID: teams[9-1].id, teamOne: teams[6-1], teamTwo: teams[9-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[5-1].id, teamTwoUUID: teams[3-1].id, teamOne: teams[5-1], teamTwo: teams[3-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[7-1].id, teamTwoUUID: teams[12-1].id, teamOne: teams[7-1], teamTwo: teams[12-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11-1].id, teamTwoUUID: teams[6-1].id, teamOne: teams[11-1], teamTwo: teams[6-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[4-1].id, teamTwoUUID: teams[9-1].id, teamOne: teams[4-1], teamTwo: teams[9-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[10-1].id, teamTwoUUID: teams[8-1].id, teamOne: teams[10-1], teamTwo: teams[8-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[2-1].id, teamTwoUUID: teams[1-1].id, teamOne: teams[2-1], teamTwo: teams[1-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[12-1].id, teamTwoUUID: teams[10-1].id, teamOne: teams[12-1], teamTwo: teams[10-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[3-1].id, teamTwoUUID: teams[7-1].id, teamOne: teams[3-1], teamTwo: teams[7-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[8-1].id, teamTwoUUID: teams[1-1].id, teamOne: teams[8-1], teamTwo: teams[1-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[6-1].id, teamTwoUUID: teams[4-1].id, teamOne: teams[6-1], teamTwo: teams[4-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[9-1].id, teamTwoUUID: teams[2-1].id, teamOne: teams[9-1], teamTwo: teams[2-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+        {teamOneUUID: teams[11-1].id, teamTwoUUID: teams[5-1].id, teamOne: teams[11-1], teamTwo: teams[5-1], sets: {teamOne: 0, teamTwo: 0}, points: {teamOne: 0, teamTwo:0}, completed: false},
+      ]
+      return {results:results, table: setGamesTable(results, divisionIndex), finals: setFinalGamesTable(results,teams, divisionIndex, false, [], [])} 
     }
 
     function setGamesTable(results, divisionIndex){
