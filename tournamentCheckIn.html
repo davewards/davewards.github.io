@@ -403,20 +403,36 @@
         // saveInTournament();
     }
 
+    function sendDataToStorage(tries){
+        
+        function onError(err){
+            triesLeft = tries - 1;
+            if(!triesLeft){
+                throw err;
+            }
+            return wait(5).then(() => sendDataToStorage(triesLeft));
+        }
+        var raw = JSON.stringify({ "divisions": divisions, "registration_complete": document.getElementById('registration_complete_toggle').checked, "full_registration_state": XL_row_object });
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+        fetch("https://getpantry.cloud/apiv1/pantry/b13e127b-9319-480e-a976-d53846169c26/basket/" + bucketId, requestOptions).then().catch(onError);
+    }
+
+    function wait(delay){
+        return new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
     function saveInTournament() {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        var raw = JSON.stringify({ "divisions": divisions, "registration_complete": document.getElementById('registration_complete_toggle').checked, "full_registration_state": XL_row_object });
         const bucketId = document.getElementById('tournamentName').value;
         if (bucketId.length > 0) {
-            var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: raw,
-                redirect: 'follow'
-            };
-            fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, requestOptions).then();
+            sendDataToStorage(5)
         } else {
             confirm(`Please Provide Tournament Name`);
         }
@@ -424,7 +440,7 @@
 
     function loadLastState() {
       const bucketId = document.getElementById('tournamentName').value;
-      fetch("https://getpantry.cloud/apiv1/pantry/8c06b329-fc03-4384-bf47-6104bb54a37b/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
+      fetch("https://getpantry.cloud/apiv1/pantry/b13e127b-9319-480e-a976-d53846169c26/basket/" + bucketId, {methos: "get", headers: {"Content-Type": "application/json"}}).then(resp => {
         resp.json().then(data => {
             XL_row_object = data.full_registration_state
             setTable()
